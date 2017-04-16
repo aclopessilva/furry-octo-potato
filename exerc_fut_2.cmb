@@ -1,0 +1,11 @@
+# iComb: http://www.matematica.br
+[ .: version: 0.8.2 :. ]
+04/07/2011 01:06:19; leo ]
+[ /home/leo/projetos/icomb; /home/leo; /usr/local/ibm/jre;  ]
+{EnumGabarito: a}
+{Tipo: exercicio: 1}
+{solucao: 1:jogador={1}}
+{resposta: 4}
+{ArquivoUniverso: futebol/futebol.xml}
+{dica: b}
+{online: 0}

@@ -1,0 +1,10 @@
+# iComb: http://www.matematica.br
+[ .: version: 0.8.1 :. ]
+
+{EnumGabarito: Com um baralho de 32 cartas, quantas mãos de 20 cartas é possível formar com 3 ases, 4 espadas e 16 cartas vermelhas?}
+{Tipo: exercicio: 5}
+{solucao: _h6936333790353173666b57376c6d7766723676112d0377451769772756d3d56667aa576d63557cd7a660734b5b767373b333751334d620046676b2d34d0b416b557314575313477727}
+{resposta: 35}
+{ArquivoUniverso: baralho/baralho.xml}
+{dica:  O conjunto de subconjuntos com 20 elementos tomados em um baralho com 32 cartas. Um baralho de 32 cartas corresponde a um baralho comum sem as cartas cujos valores são menores do que 7 (7,8,9,10,Valete, Dama, Rei e Ás)}
+{online: 0}

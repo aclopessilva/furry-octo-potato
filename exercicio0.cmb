@@ -1,0 +1,10 @@
+# iComb: http://www.matematica.br
+[ .: version: 0.8.1 :. ]
+
+{EnumGabarito: Quantas possibilidades de 1 carta tipo As?}
+{Tipo: exercicio: 0}
+{solucao: _h6b3767d15d3a1c366737166556}
+{resposta: 4}
+{ArquivoUniverso: baralho/baralho.xml}
+{dica: Baralho completo, com 52 cartas, 4 de cada.}
+{online: 0}

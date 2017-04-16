@@ -1,0 +1,11 @@
+# iComb: http://www.matematica.br
+[ .: version: 0.8.2 :. ]
+[ 03/07/2011 23:23:37leo; ]
+[ /home/leo/projetos/icomb; /home/leo; /usr/local/ibm/jre;  ]
+{EnumGabarito: Quantos jogadores existem que tenham caminha número 11?}
+{Tipo: exercicio: 1}
+{solucao: 1:jogador={11}}
+{resposta: 4}
+{ArquivoUniverso: futebol/futebol.xml}
+{dica: Lembre-se que são 4 times}
+{online: 0}

@@ -1,0 +1,448 @@
+<universo nome="Baralho de 32 cartas" >
+  <elemento nome="Goleiro" imagem="az1.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>1</valor>
+       <predicado>goleiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="az2.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>2</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="az3.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>3</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+
+  <elemento nome="Zagueiro" imagem="az4.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>4</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="az5.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>5</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="az6.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>6</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="az7.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>7</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="az8.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>8</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="az9.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>9</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="az10.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>10</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="az11.png">
+     <atributo nome="time">
+       <valor>azul</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>11</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Goleiro" imagem="vm1.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>1</valor>
+       <predicado>goleiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="vm2.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>2</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="vm3.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>3</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+
+  <elemento nome="Zagueiro" imagem="vm4.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>4</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vm5.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>5</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vm6.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>6</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vm7.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>7</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vm8.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>8</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vm9.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>9</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="vm10.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>10</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="vm11.png">
+     <atributo nome="time">
+       <valor>vermelho</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>11</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+
+
+  <elemento nome="Goleiro" imagem="am1.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>1</valor>
+       <predicado>goleiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="am2.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>2</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="am3.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>3</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+
+  <elemento nome="Zagueiro" imagem="am4.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>4</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="am5.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>5</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="am6.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>6</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="am7.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>7</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="am8.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>8</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="am9.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>9</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="am10.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>10</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="am11.png">
+     <atributo nome="time">
+       <valor>amarelo</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>11</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+
+
+  <elemento nome="Goleiro" imagem="vd1.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>1</valor>
+       <predicado>goleiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="vd2.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>2</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Zagueiro" imagem="vd3.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>3</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+
+  <elemento nome="Zagueiro" imagem="vd4.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>4</valor>
+       <predicado>zagueiro</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vd5.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>5</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vd6.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>6</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vd7.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>7</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vd8.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>8</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Meio-campo" imagem="vd9.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>9</valor>
+       <predicado>meio-campo</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="vd10.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>10</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Atacante" imagem="vd11.png">
+     <atributo nome="time">
+       <valor>verde</valor>
+     </atributo>
+     <atributo nome="jogador">
+       <valor>11</valor>
+       <predicado>atacante</predicado>
+     </atributo>
+  </elemento>
+</universo>
+

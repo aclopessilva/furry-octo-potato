@@ -1,0 +1,106 @@
+
+Estrutura:
+
+src/icomb/ui/ChooseExercisePanel
+ new 
+src/icomb/ui/VerticalPanel
+
+src/icomb/ui/SetMachinePanel.java
+ + cePanel = new ChooseExercisePanel(this)
+ + new VerticalPanel
+ + duPanel = new DefinedUniversePanel(this)
+ + cPanel = new ConstructionPanel(this)
+ + dPanel = new DrawingPanel(mf)
+
+src/icomb/ui/ConstructionPanel.java
+ + painel_nsbp = new NewStageButtonPanel(this)
+ + painel_sp = new StagePanel(this)
+ + painel_lp = new ListPanel(this)
+
+src/icomb/ui/NewStageButtonPanel
+ + btnNewStage = ObjectManager.criaBotao(...)          - "Novo"       (Estagio)
+ + btnIAmDone = ObjectManager.criaBotao(t...)          - "Terminei"
+ + btnEraseStage = ObjectManager.criaBotao(...)        - "Apagar"     (Estagio)
+ + btnResetConstruction = ObjectManager.criaBotao(...) - "Reinicia"   (Estagio)
+ + lblLabel = new Label("Stage")                       - "Estagio"    (o componente mais a esquerda deste painel)
+
+src/icomb/ui/StagePanel
+ + ConstructionPanel painelConstrucao =
+ + Button btnVerifyStage, btnAddStage
+ + CustomChoice chNumberOfElements, chNumberOfProp, chAttributes1, chAttributes2, chRelations1, chRelations2, chElements1, chElements2
+ + Label lblIWant, lblElementsVerifying, lblExplain, lblAnd1, lblAnd2
+ + Panel panelFormula, panelFormulaEdit
+ + Label lblFormula, lblN, lblP
+ + CustomChoice chFormula, chN, chP
+ + Panel panelFormulaCancel
+ + Label lblCancel
+ + Button btnCancelFormula, btnOk
+ + ListFrame listFrame;
+ + Label lblListElements1, lblListElements2
+
+ +----- ? -----------------------------------------------------------------------------------+
+ | logo
+ | +-----------
+ | | enunciado
+ | +-----------
+ | +-----------
+ | | dica
+ | +----------- 
+ | +----- ConstructionPanel --------------------------------------------------------
+ | | +------ NewStageButtonPanel ------------------------------------------------+
+ | | | Estagio   <Novo>  <Apagar>  <Reinicia>                         <Terminei> |
+ | | +---------------------------------------------------------------------------+
+ | | +------ StagePanel ---------------------------------------------------------+
+ | | |                                                                           |
+ | | |                                                                           |
+ | | | <Validar Estágio>  <Adicionar Estágio>                                    |
+ | | +---------------------------------------------------------------------------+
+ | | +------ ListPanel ----
+ | | | desenha instancias
+ | | +-----------
+ | +--------------------------------------------------------------------------------
+ | +-----------
+ | | barra de msgs
+ | +-----------
+ +-----------------------------------------------------------------------------------------------------------+
+
+
+ <Novo> [Apagar] [Reinicia]                          src/icomb/ui/NewStageButtonPanel: btnNewStage; btnEraseStage; btnResetConstruction
+
+ [Validar Estagio] [Adicionar Estagio]               src/icomb/ui/StagePanel: btnVerifyStage; btnOk; btnCancelFormula; btnAddStage
+ +-          -+ [Excluir Selecao]                    src/icomb/ui/ListPanel: btnSupressSelection; btnModifySelection; chAction
+ |texto       | [...]
+ +-          -+
+
+--------------------------------------------------
+
+Iniciar:
+ <Novo> [Apagar] [Reinicia]
+ 
+ 
+ [Validar Estagio] [Adicionar Estagio]
+ +-          -+ [Excluir Selecao]
+ |texto       | [...]
+ +-          -+
+
+
+---
+4.
+ <Novo> [Apagar] <Reinicia>
+ 
+ 
+ [Validar Estagio] [Adicionar Estagio]
+ +-          -+ [Excluir Selecao]
+ |texto       | [...]
+ +-          -+
+ <desenho instancia>
+
+---
+ <Novo> [Apagar] <Reinicia>
+ 
+ 
+ [Validar Estagio] [Adicionar Estagio]
+ +-          -+ [Excluir Selecao]
+ |texto       | [...]
+ +-          -+
+

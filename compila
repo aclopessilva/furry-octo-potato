@@ -1,0 +1,6 @@
+# javac -encoding iso-8859-1 -target 1.1 
+# javac -encoding iso-8859-1 base/*.java ajuda/evento/*.java ajuda/visao/componentesDoTexto/*.java ajuda/visao/navegador/*.java ajuda/modelo/*.java ajuda/*.java icomb/ui/*.java icomb/formula/*.java icomb/events/*.java icomb/objects/*.java icomb/machine/*.java icomb/components/*.java icomb/erro/*.java icomb/util/*.java icomb/*.java
+/usr/local/j2sdk1.4.2/bin/javac -encoding iso-8859-1 -target 1.1 -sourcepath src -d bin src/base/*.java src/ajuda/evento/*.java src/ajuda/visao/componentesDoTexto/*.java src/ajuda/visao/navegador/*.java src/ajuda/modelo/*.java src/ajuda/*.java src/icomb/ui/*.java src/icomb/formula/*.java src/icomb/events/*.java src/icomb/objects/*.java src/icomb/machine/*.java src/icomb/components/*.java src/icomb/erro/*.java src/icomb/util/*.java src/icomb/*.java
+
+# Se precisar compilar com Java 5 ou 6
+# /usr/local/jdk5.03/bin/javac -encoding iso-8859-1 -source 1.2 -target 1.1 -sourcepath src -d bin src/base/*.java src/ajuda/evento/*.java src/ajuda/visao/componentesDoTexto/*.java src/ajuda/visao/navegador/*.java src/ajuda/modelo/*.java src/ajuda/*.java src/icomb/ui/*.java src/icomb/formula/*.java src/icomb/events/*.java src/icomb/objects/*.java src/icomb/machine/*.java src/icomb/components/*.java src/icomb/erro/*.java src/icomb/util/*.java src/icomb/*.java

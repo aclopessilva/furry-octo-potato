@@ -1,0 +1,292 @@
+<universo nome="Baralho de 32 cartas" >
+  <elemento nome="Ás de ouros" imagem="ad.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>ace</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="7 de ouros" imagem="7d.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>7</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="8 de ouros" imagem="8d.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>8</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="9 de ouros" imagem="9d.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>9</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="10 de ouros" imagem="td.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>10</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Valete de ouros" imagem="jd.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>jack</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Dama de ouros" imagem="qd.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>queen</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Rei de ouros" imagem="kd.gif">
+     <atributo nome="suit">
+       <valor>diamonds</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>king</valor>
+     </atributo>
+  </elemento>
+
+  <elemento nome="Ás de espadas" imagem="as.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>ace</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="7 de espadas" imagem="7s.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>7</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="8 de espadas" imagem="8s.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>8</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="9 de espadas" imagem="9s.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>9</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="10 de espadas" imagem="ts.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>10</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Valete de espadas" imagem="js.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>jack</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Dama de espadas" imagem="qs.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>queen</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Rei de espadas" imagem="ks.gif">
+     <atributo nome="suit">
+       <valor>spades</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>king</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Ás de copas" imagem="ah.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>ace</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="7 de copas" imagem="7h.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>7</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="8 de copas" imagem="8h.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>8</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="9 de copas" imagem="9h.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>9</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="10 de copas" imagem="th.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>10</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Valete de copas" imagem="jh.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>jack</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Dama de copas" imagem="qh.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>queen</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Rei de copas" imagem="kh.gif">
+     <atributo nome="suit">
+       <valor>hearts</valor>
+       <predicado>red</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>king</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Ás de paus" imagem="ac.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>ace</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="7 de paus" imagem="7c.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>7</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="8 de paus" imagem="8c.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>8</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="9 de paus" imagem="9c.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>9</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="10 de paus" imagem="tc.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>10</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Valete de paus" imagem="jc.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>jack</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Dama de paus" imagem="qc.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>queen</valor>
+     </atributo>
+  </elemento>
+  <elemento nome="Rei de paus" imagem="kc.gif">
+     <atributo nome="suit">
+       <valor>clubs</valor>
+       <predicado>black</predicado>
+     </atributo>
+     <atributo nome="value">
+       <valor>king</valor>
+     </atributo>
+  </elemento>
+</universo>
+

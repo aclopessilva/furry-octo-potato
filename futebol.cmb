@@ -1,0 +1,10 @@
+# iComb: http://www.matematica.br
+[ .: version: 0.1 :. ]
+
+{EnumGabarito: Quantos times de 13 jogadores podemos formar com exatamente 5 jogadores do time azul e exatamente 5 jogadores do time verde?}
+{Tipo: exercicio: 1}	
+{solucao: 5:time={azul};5:time={verde};3:time#{azul,verde}}
+{resposta: 328703760}
+{ArquivoUniverso: futebol/futebol.xml}
+{dica: O Universo Futebol corresponde a quatro equipe com 11 jogadores. Equipe Azul, Amarelo, Verde e Vermelho. O jogador número 1 sempre será goleiro, de 2 a 4 são todos zaqueiros. Meio-campo são de 5 a 9 enquanto 10 e 11 são atacantes.}
+{online: 0}

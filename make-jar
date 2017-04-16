@@ -1,0 +1,3 @@
+cd bin
+/usr/local/j2sdk1.4.2/bin/jar cmf mainClass ../iComb.jar *.properties base/*.class ajuda/evento/*.class ajuda/visao/componentesDoTexto/*.class ajuda/visao/navegador/*.class ajuda/modelo/*.class ajuda/*.class icomb/futebol/ icomb/baralho/ icomb/img/*.gif icomb/ui/*.class icomb/formula/*.class icomb/events/*.class icomb/objects/*.class icomb/machine/*.class icomb/components/*.class icomb/erro/*.class icomb/util/*.class icomb/*.class
+cd ..

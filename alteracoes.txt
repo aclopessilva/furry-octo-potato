@@ -1,0 +1,1794 @@
+
+Para depurar:
+- pegar solucao: descomentar em 'src/icomb/ui/ChooseExercisePanel.java' método 'actionPerformed(...)' o 'To exam the solution-model:'
+
+- src/icomb/ui/SetMachinePanel.java
+ . void criarExercicio (): evitar 'getParameter(...)' se nao applet
+
+- src/icomb/ui/ImagePanel.java
+  . public Image setElement (Universo universo, Element element, String nome): NOVO
+    TODO: rever 3 linhas com
+     'int count = nameOfImage!=null ? nameOfImage.length() : 0;
+      if (count>5 && nameOfImage.substring(0,5).equalsIgnoreCase("icomb"))
+         nameOfImage = nameOfImage.substring(5,count);'
+
+- src/icomb/util/GerenciadorRecursos.java
+  . public static Image getImageFromJAR (java.applet.Applet applet, String strImageName) 
+    //TODO ??? Parece ser fonte do erro de repintar DrawingPanel o tempo todo!!!! ???
+
+
+Faltam
+ + msg: choiceAttribute2-dica; choiceRelation2-dica; choiceElement2-dica; 
+ + internacionalizar
+   'ObjectManager.setMachine.mudaDic("Selecione as op...)'
+ + USABILIDADE: ao ler arq. CMB nao permitir que troque universo (desabilitar)
+ + falta testar iComb como applet, para enviar exercicio novo (professor)
+ + apos terminar resolucao do exercicios, mesmo no aplicativo, sobre o botao "send" (mesmo usando BR esta em Ingles)
+
+---
+
+Acima nao consta chamada de 'ConstructionFooterPanel.java', por que?
+
+criarExercicio():
+ + em 'src/icomb/ui/SetMachinePanel.java' para fazer POST e
+ + em 'src/icomb/ui/ConstructionPanel.java' para gravar ou chamar 'SetMachinePanel.criarExercicio()' -> alterei nome para 'sent2Server'
+ + src/icomb/machine/SetMachine.java: define 'boolean online, modoCriacao', respectivamente para 'iComb applet' e 'construcao de exercicio'
+
+
+Universo.java
+ CUIDADO: se for applet (com JAR) o nome tem que ser do tipo
+ . public void setArquivo (String directory, String arquivo)
+   this.arquivo = arquivo; //  2008-2013: it must be { "baralho/baralho.xml" or "futebol/futebol.xml" }
+   this.directory = clearDirectoryFromName(arquivo) + "/imagens/" ; // 2008-2013: { "baralho/imagens/" or "futebol/imagens/" }
+
+---
+
+Caminho para definir caminhos!
+
+src/icomb/IComb.java
+ . private void iniciaExercicio ()   
+   String strPath = icomb.util.GerenciadorRecursos.getPath(this);
+   ObjectManager.setMachine.setArquivoUniverso(strPath, ArquivoUniverso);
+
+src/icomb/util/GerenciadorRecursos.java
+ . public static String getPath (Object obj):
+
+
+SetMachine.java
+ Correto: aplicativo
+  at icomb.machine.SetMachine.setArquivoUniverso(SetMachine.java:534)
+  at icomb.IComb.iniciaExercicio(IComb.java:401)
+  at icomb.IComb.main(IComb.java:178)
+ Erro: applet
+  at icomb.machine.SetMachine.setArquivoUniverso(SetMachine.java:534)
+  at icomb.IComb.iniciaExercicio(IComb.java:401)
+  at icomb.IComb.init(IComb.java:233)
+ . public void setArquivoUniverso (String directory, String arquivo)
+   this.directory = directory;
+   this.arquivoUniverso = directory + arquivo;
+
+ImagePanel.java
+ . public void setElement (Universo universo, Element element, String nome, Image img)
+   deixei comentarios!
+
+---
+BUG: nao estava mostrando imagens ou pegando arquivos 'baralho/baralho.xml' (ou outros)
+     'java -jar iComb.jar  exercicio0.cmb' => NAO carrega imagens!
+     tem "loop" qdo applet!
+
+
+---
+
+
+---
+28-29/08/2014
+
+Versao 0.9.4
+
+- src/icomb/util/Configuracoes.java
+  + 'public static final String strVersao = "0.9.4";'
+
+- src/icomb/IComb.java
+  + novos: private static boolean ISJAR = false;
+    public static boolean getISJAR () { return ISJAR; }
+  + public static void main (String[] args) throws IOException
+    acresc. no inicio 'String strAux = icomb.util.GerenciadorRecursos.getClassPath("icomb/IComb.class");
+    if (strAux!=null) if (strAux.length()>4 && strAux.substring(0,4).equalsIgnoreCase("jar:")) ISJAR = true;'
+
+- src/icomb/util/GerenciadorRecursos.java
+ . public static String printVectorString (String vetStr[]): 41/581
+   novo para testes
+
+ . public static String getPath (Object obj): 458/581
+
+ . public static Image getImagem (MontaFace mf, String nomeCompletoImagem): 212/581
+   + no 'else' de 'if (strURLpath==null || strURLpath.equals("null"))', troquei 'return Toolkit.getDefaultToolkit().getImage(nomeCompletoImagem);' por
+     "if (IComb.getISJAR()) return GerenciadorRecursos.getImageFromJAR(mf.getApplet(), nomeCompletoImagem);
+      else return Toolkit.getDefaultToolkit().getImage(nomeCompletoImagem);"
+
+ . public static String getClassPath (String strName)
+   + acresc. 'try/catch' "just in case"...
+
+- src/icomb/util/Parse.java
+ . public static Universo parseUniverso (String nomeDoArquivo):
+   para funcionar qdo NAO "application with command line 'java -jar iComb.jar'"
+   + acresc. 'if/else' ao 'is = new BufferedInputStream(new FileInputStream(nomeDoArquivo))' ficando
+     'if (!icomb.IComb.getISJAR()) is = new BufferedInputStream(new FileInputStream(nomeDoArquivo));
+      else is = icomb.IComb.class.getClassLoader().getResourceAsStream(nomeDoArquivo);'
+
+
+- src/icomb/ui/ImagePanel.java
+  IMPORTANTE: havia uma duplicidade de metodos 'getElement(...)' e 'setElement(...)', desnecessario, juntei ambos
+  pois eram chamados apenas em 'icomb.ui.UniversoFrame.load()'
+
+  . public Image setElement (Universo universo, Element element, String nome): NOVO
+    com os codigos dos antigos 'getElement(...)' e de 'setElement(...)' fundidos
+    TODO: rever linhas com 'int count = nameOfImage!=null ? nameOfImage.length() : 0;
+          if (count>5 && nameOfImage.substring(0,5).equalsIgnoreCase("icomb")) nameOfImage = nameOfImage.substring(5,count);'
+
+  . public Image getElement1 (Universo universo, Element element): REMOVI
+  . public Image setElement (Universo universo, Element element, String nome, Image img): REMOVI
+
+
+- src/icomb/ui/UniversoFrame.java
+  IMPORTANTE: agora chama apenas o novo 'ImagePanel.setElement(Universo universo, Element element, String nome)'
+ . public void load ():
+   + eliminadoas as 2 linhas:
+     'img_aux = imgPanel.getElement1(universo, element); // pega Image a partir do arquivo no JAR com universo
+      imgPanel.setElement(universo, element, imgPanel.getNome(), img_aux); // define imagem ('Image') e nome da mesma'
+     acresc. a nova:
+     'imgPanel.setElement(universo, element, imgPanel.getNome());'
+
+
+---
+27/08/2014
+
+- src/icomb/util/GerenciadorRecursos.java
+
+ . public static String getPath (Object obj): 253/532
+   + ver: '//Q quarentena - apos certificar apagar comandos abaixo
+     if(1==1) return strURLpath;'
+   + no else de 'if (strURLpath==null || strURLpath.equals("null"))' acresc.
+     'if (strURLpath.substring(0,5).equalsIgnoreCase("file:")) strURLpath = strURLpath.substring(5,strURLpath.length());'
+     para evitar 'file:' como em 'file:/home/leo/projetos/iMA/iMA0/icomb/novo/bin/icomb/'
+   
+
+ . public static InputStream getInputStream (MontaFace mf, String nomeCompletoArquivo) throws FileNotFoundEx...
+   325/532
+   + em aplicativo, eliminei ' locationFile = new File(nomeCompletoArquivo); return new FileInputStream(locationFile);'
+   + acresc. '"icomb" + ' em 'nomeCompletoArquivo = "icomb" + nomeCompletoArquivo;
+   + troquei 'nomeCompletoArquivo = clearFileFromName(nomeCompletoArquivo);' por: 
+     'else' de 'if (mf.getApplet()!=null && IComb.isApplet())'
+     'if (count>2) {
+     int index = nomeCompletoArquivo.lastIndexOf("icomb/");
+     nomeCompletoArquivo = nomeCompletoArquivo.substring(index, nomeCompletoArquivo.length());
+     InputStream is =  IComb.class.getClassLoader().getResourceAsStream(nomeCompletoArquivo);'
+     pois tem que fazer 'is' com  'icomb/futebol/futebol.xml', nao '/home/leo/projetos/iMA/iMA0/icomb/novo/bin/icomb/futebol/futebol.xml'
+
+ . public static String clearFileFromName (String fileName)
+   + acresc. '   int count = countSlashesString(fileName);
+       if (count==2) {
+         fileName = getClassPath("icomb"+fileName); //user.home
+	 return fileName; }'
+     mas deixei de usar 'clearFileFromName(...)'
+
+ . public static String getClassPath (String strName): novo, nao usei! - 414/532
+
+
+- src/icomb/machine/SetMachine.java
+  para pegar corretamente universo ao construir exercicio (escolhendo universo)
+  . public void setArquivoUniverso (String directory, String arquivo)
+    + sob 'if (!icomb.IComb.isApplet())' troquei 'directory = icomb.util.GerenciadorRecursos.clearFileFromName(directory);'
+      por 'directory = icomb.util.GerenciadorRecursos.getPath(this);'
+
+
+
+- src/icomb/ui/DefinedUniversePanel.java
+  para funcionar JAR e sem arquivo CMV
+  . public void itemStateChanged (ItemEvent e):
+    + acresc. 'if (strUniversePath!=null && strUniversePath.equals("/")) strUniversePath = "icomb/";'
+
+
+
+GerenciadorRecursos.getPath(Object): /home/leo/projetos/iMA/iMA0/icomb/novo/bin/icomb/
+java.lang.StringIndexOutOfBoundsException: String index out of range: 3
+ at java.lang.String.charAt(String.java:444)
+ at icomb.machine.SetMachine.setArquivoUniverso(SetMachine.java:534)
+ at icomb.IComb.iniciaExercicio(IComb.java:406)
+ at icomb.IComb.main(IComb.java:183)
+
+
+---
+03/06/2014
+
+  NAO acertei bug de path!
+
+- src/icomb/util/GerenciadorRecursos.java
+ . public static String getContentTextJAR (java.applet.Applet applet, String str_arquivo): novo
+ . public static Image getImageFromJAR (java.applet.Applet applet, String strImageName): novo
+   ??? este parece gerar o "loop" em DrawingPanel!!! ??? ---------------------------------------- ???
+ . public static Image getImagem (MontaFace mf, String nomeCompletoImagem):
+   +
+ . public static InputStream getInputStream (MontaFace mf, String nomeCompletoArquivo) throws FileNotFoundException
+   + usa 'clearFileFromName(String)' em 
+     se NAO applet com 'nomeCompletoArquivo = clearFileFromName(nomeCompletoArquivo);''
+   + em 'if (is == null)' eliminandos 'locationFile = new File(nomeCompletoArquivo);' e 'return new FileInputStream(locationFile);'
+     eh applet, entao apenas resultaria erro fazer isso
+ . public static String clearFileFromName (String fileName): novo
+
+ . public static Image getImagem (MontaFace mf, String nomeCompletoImagem): --------------- fonte do "loop" ---------------
+   REVER!!!
+   + trocado 'return mf.getApplet().getImage(mf.getApplet().getCodeBase(), nomeCompletoImagem);' por
+     'return GerenciadorRecursos.getImageFromJAR(mf.getApplet(), nomeCompletoImagem);'
+     para funcionar applet (anterior tinha excecao de seguranca), MAS novo gera "loop" no DrawingPanel
+
+
+- src/icomb/machine/SetMachine.java:
+ . public void setArquivoUniverso (String directory, String arquivo):
+   + acresc. 'if (!icomb.IComb.isApplet()) directory = icomb.util.GerenciadorRecursos.clearFileFromName(directory);'
+     no caso de aplicativo: clear 'file:/' from the name 'file:/home/leo/projetos/iMA/iMA0/icomb/novo/bin/icomb/baralho/imagens/ad.gif'
+
+- src/icomb/ui/TrataImagem.java
+ . public static Image pegaImagem (String str_imagem): pega cada uma das imagens para mostrar o conjunto Universo atual
+
+- src/icomb/ui/ImagePanel.java
+ . public Image getElement (Universo universo, Element element):
+   + saiu 'imgItemUniverso = GerenciadorRecursos.getImagem(mf, nameOfImage);'
+     nem  'imgItemUniverso = icomb.ui.TrataImagem.pegaImagem(nameOfImage);' - mas NAO parece mudar algo...
+     ??? deixei apenas 'imgItemUniverso = null' e continua mostrando as imagens!
+ . public void setElement (Universo universo, Element element, String nome, Image img):
+   + eliminei o 'repaint()' final
+
+- src/icomb/IComb.java:
+ . public static String debugMsg (String msg): novo, para depuracao
+
+
+
+--------------------------------------------------------------------------------
+
+[31/05/2014]
+
+Versao 0.9.2
+
+BUG: em carga de applet, nao carregava o universo (e outros GIF) em funcao de estar o caminho no JAR errado!
+
+- src/icomb/util/GerenciadorRecursos.java
+ . public static InputStream getInputStream (MontaFace mf, String nomeCompletoArquivo):
+   + para carregar "applet" estava precisando dos diretorios "baralho/baralho.xml" senao erro em 'src/icomb/util/GerenciadorRecursos.java' no
+     solucao: acresc. '"/icomb/"+' em 'getResourceAsStream(nomeCompletoArquivo);' ficando
+     'InputStream is =  mf.getApplet().getClass().getResourceAsStream("/icomb/" +nomeCompletoArquivo);'
+ . public static String getPath (Object obj)
+   + eliminando 'strURLpath = "bin/icomb/";' acresc. apos 'if': int index = strURLpath.indexOf("/"); strURLpath = strURLpath.substring(index, strURLpath.length());
+
+- src/icomb/ui/DefinedUniversePanel.java
+ . public void itemStateChanged (ItemEvent e):
+   + acresc. 'String strUniverseSet =  null;' para eliminar a volta de processamento 'int index = strUniverse.lastIndexOf("icomb/");...'
+
+- src/icomb/ui/ImagePanel.java
+ Acerto para, a partir de correcoes na antiga versao 0.9.1 (abandonada pelo "loop" em DrawingPanel), conseguir pegar corretamente a imagem
+ . public void setElement (Universo universo, Element element, String nome, Image img):
+   + trocado 'String dirImagens = nomeArquivo.substring(0,nomeArquivo.indexOf("/")) + "/imagens/"; String nameOfImage = dirImagens + element.getImagem();'
+     por
+     'String dirImagens = nomeArquivo.substring(0,nomeArquivo.lastIndexOf("/")) + "/imagens/";
+      String nameOfImage = dirImagens + element.getImagem();'
+
+
+- src/icomb/ui/DefinedUniversePanel.java
+ . public void itemStateChanged (ItemEvent e)
+   + trocado 'uni.setArquivo("icomb/", strUniverse);' por 'uni.setArquivo(strUniversePath, strUniverse);'
+- src/icomb/IComb.java:
+ . private void iniciaExercicio (): para passar o path completo (mesmo redirecionando com linha de comando 'java -cp bin ...')
+   + sai 'ObjectManager.setMachine.setArquivoUniverso("icomb/", ArquivoUniverso);'
+     entre 'String strPath = icomb.util.GerenciadorRecursos.getPath(this);
+            ObjectManager.setMachine.setArquivoUniverso(strPath, ArquivoUniverso);'
+
+Definir corretamente caminho para imagens de Universo:
+- src/icomb/machine/SetMachine.java
+ . public void setArquivoUniverso (String directory, String arquivo): 
+   + acresc. o path ao 'arquivoUniverso', ou seja, 'directory +' em
+     'this.arquivoUniverso = directory + arquivo;'
+- src/icomb/ui/UniversoFrame.java
+  eh quem de fato desenha as imagens do Universo (eh um 'PopUpFrame')
+
+Mas isso impediu funcionamento de instancias!!!
+DrawingPanel.java
+ . public void paint (Graphics g):
+   + novo campo: Universo universo;
+   + acrescido: 'Universo _universo = this.universo; if (_universo==null) { _universo = ObjectManager.setMachine.getUniverso(); this.universo = _universo; }'
+     trocas: '_universo' no lugar de 'ObjectManager.setMachine.getUniverso()'
+   + caminho estava errado, ficava apenas '/imagens' qdo deveria ser, e.g., '/home/leo/projetos/iMA/iMA0/icomb/novo/bin/icomb/baralho/imagens/'
+     troquei 'dirImagens = nomeArquivo.substring(0,nomeArquivo.indexOf("/")) + "/imagens/";'
+     por     'dirImagens = nomeArquivo.substring(0,nomeArquivo.lastIndexOf("/")) + "/imagens/";'
+
+
+- icomb/ui/UniversoFrame.java
+
+- icomb/IComb.java
+  + private static final String LINE = "..."
+    private static String ICOMB = " .: iComb : " + I18n.getString("iComb") + " ("+versao+") :.\n    http://www.matematica.br/icomb\n";
+  . public static void main (String[] args) throws IOException:
+    + retirei daqui o 'println' de " .: iComb : " + I18n.getString("iComb") + " ("+versao+") :.\n    http://www.matematica.br/icomb\n"
+  . private void monta ():
+    + acresc. 'ICOMB = " .: iComb : " + I18n.getString("iComb") + " ("+versao+") :.\n    http://www.matematica.br/icomb\n";
+      System.out.println(LINE+ICOMB);'
+
+- icomb/I18n.java:
+  + eliminado alguns 'println'
+
+
+FALTA: acertar path de imagens para applet!
+
+
+
+--------------------------------------------------------------------------------
+
+[29/05/2014-30/05/2014]
+
+Versao 0.9.1
+
+
+Bug de selecao de universo: so funcionava para 'baralho' por conta de um erro no 'DefinedUniversePanel.java' em criacao de exerc.
+Bug de 'loop' infinito em imagens de instacia! Grave: travava maquina - voltei metodos de carga de imagem da versao iComb 0.8.8
+    |
+    |
+    |Tentei desligar:
+    |- src/icomb/util/GerenciadorRecursos.java
+    | . public static Image getImagemApplication (String nomeCompletoImagem)
+    |   + return icomb.ui.TrataImagem.pegaImagem(nomeCompletoImagem);
+    |- src/icomb/util/TrataImagem.java
+    | . deixei, esta em uso no 'icomb_2011' e funcionando
+    |
+    |
+    |- /home/leo/projetos/iMA/iMA0/icomb/icomb0.9.1/src/icomb/util/GerenciadorRecursos.java
+    | . public static Image getImagem (MontaFace mf, String nomeCompletoImagem):
+    |   + o comando que estava abaixo estava gerando o "loop" doido que atualizava 'DrawingPanel.paint(Graphics)' o tempo todo!!!
+    |     'return icomb.ui.TrataImagem.pegaImagem(nomeCompletoImagem);'
+    |     voltei o 
+    |     'return Toolkit.getDefaultToolkit().getImage(nomeCompletoImagem);'
+    |- /home/leo/projetos/iMA/iMA0/icomb/icomb0.9.1/src/icomb/ui/ImagePanel.java
+    | . public void setElement (Universo universo, Element element, String nome, Image img)
+    |   + tinha sumido o comando a seguir que parece relevante...: imgItemUniverso =  GerenciadorRecursos.getImagem(mf, nameOfImage);
+ 
+
+
+TODO: para cada universo definir
+ icomb.util.Util.univSetK (onde K eh num. de ordem do novo universo)
+ icomb/ui/DefinedUniversePanel.itemStateChanged(...): precisa do 'if setChoosen.equals(I18n.getString("universeK")))'
+
+- icomb/ui/UniversoFrame.java
+ . public UniversoFrame (MontaFace mf):
+   + sai 'super("Mensagem");' e entra 'super(I18n.getString("universe"));'
+ . public UniversoFrame (MontaFace mf):
+   + passei todo seu codigo para novo construtoar abaixo
+   + coloquei comando unico: this(mf, null);
+ . public UniversoFrame (MontaFace mf, Universo universo)
+   + novo metodo com param. 'Universo' para conseguir mostrar logo que carrega
+   + internacionalizar: super(I18n.getString("windowShowUniverse")); // windowShowUniverse=Universo atual
+
+- src/i18n_*.properties
+ + windowShowUniverse=Current Universe
+    
+
+- icomb/ui/DefinedUniversePanel.java
+ Para permitir mostrar o universo no modelo arrumado (com clique botao "Mostrar universo")
+ . public void actionPerformed (ActionEvent e):
+   + troquei 'UniversoFrame universoFrame = new UniversoFrame(pai.getMf()); try { Universo universo = ObjectManager.setMachine.getUniverso(); ... }'
+     por 'UniversoFrame universoFrame = null; try { Universo universo = ObjectManager.setMachine.getUniverso(); universoFrame = new UniversoFrame(pai.getMf(), universo); ... }'
+
+
+- src/icomb/ui/MessageFrame.java
+ . private MessageFrame (Panel father):
+   + sai 'super("Mensagem");' e entra 'super(I18n.getString("universe"));'
+
+
+
+- icomb/ui/DefinedUniversePanel.java
+ . public void itemStateChanged (ItemEvent e):
+   + sai 'String strUniverse = icomb.util.GerenciadorRecursos.getPath(this) + icomb.util.Util.univSet1;
+     if (setChoosen.equals(I18n.getString("universeFoot"))) strUniverse = icomb.util.Util.univSet2;'
+     entra
+     'String strUniversePath = icomb.util.GerenciadorRecursos.getPath(this);
+      String strUniverse = strUniversePath + icomb.util.Util.univSet1; // default is 'universeDeck'
+      if (setChoosen.equals(I18n.getString("universeFoot"))) 
+         strUniverse = strUniversePath + icomb.util.Util.univSet2;'
+
+
+
+--------------------------------------------------------------------------------
+[02,07,08/08/2013]
+
+Versao 0.8.9
+
+Agora tudo num so JAR
+
+- src/icomb/IComb.java
+ . public static final String UNIVERSE1 = "baralho/baralho.xml", UNIVERSE2 = "futebol/futebol.xml";: novos
+
+- src/icomb/util/GerenciadorRecursos.java
+ . public static Image getImagemApplication (Class classUniverse, String nomeCompletoImagem): novo
+ . public static InputStream getInputStream (MontaFace mf,String nomeCompletoArquivo) throws FileNotFoundException:
+  + acresc. '&& IComb.isApplet())' em 'if (mf.getApplet()!=null && IComb.isApplet())'
+  + falta generalizar:
+    String strPath = "bin/"; //
+    locationFile = new File(strPath + nomeCompletoArquivo);	
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . private void loadExercise ():
+   + acresc. '"icomb" +' em 'ObjectManager.setMachine.setArquivoUniverso( "icomb" + (String) mapExercicio.get("ArquivoUniverso"));'
+
+
+- X src/futebol/LocalizacaoImagensFutebol.java
+- X src/baralho/LocalizacaoImagensBaralho.java
+
+- src/icomb/ui/ImagePanel.java
+ BUG: nao estava carregando as imagens apos passar tudo para o 'icomb/' (nao mais precisa de 'futebol.jar' e 'baralho.jar')
+ . public Image getElement (Universo universo, Element element)
+  + 'String dirImagens = nomeArquivo.substring(0,nomeArquivo.indexOf("/")) + "/imagens/";'
+    por ''
+  + public void setElement (Universo universo, Element element, String nome, Image img)
+    BUG: erro era o comando 'imgItemUniverso = GerenciadorRecursos.getImagem(mf, nameOfImage);' que estava antes do 'repaint();'
+
+- src/icomb/ui/TrataImagem.java
+ . public Image getElement (Universo universo, Element element)
+ . public static Image pegaImagem (String str_imagem)
+
+---
+
+BUG: acertado carga de arquivos tanto em applet qto em aplicativo, agora funciona carga de
+     imagens ('icomb/img/icomb_header*.gif' e 'icomb/baralho/imagens/*.gif' ou  'icomb/futebol/imagens/*.gif')
+     e tb carga do dos descritores ('icomb/baralho/*.xml' ou  'icomb/futebol/futebol.xml')
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . private void loadExercise (): 
+   + separei o parametro em 2 para facilitar 'icomb.machine.SetMachine.setArquivoUniverso'
+     'ObjectManager.setMachine.setArquivoUniverso("icomb/", (String) mapExercicio.get("ArquivoUniverso"));'
+     era 'ObjectManager.setMachine.setArquivoUniverso("icomb/" + (String) mapExercicio.get("ArquivoUniverso"));'
+
+- src/icomb/machine/SetMachine.java
+ + private String directory: novo, must be 'icomb/'
+ . public void setArquivoUniverso (String directory, String arquivo):
+   + acresc. param. 'String directory,'
+   + acresc. 'this.directory = directory;'
+ . public void loadUniverso (MontaFace mf):
+   + acresc. 'this.directory,' em 'uni.setArquivo(this.directory, this.arquivoUniverso);'
+
+- src/icomb/objects/Universo.java:
+ + private String directory: novo, para receber "baralho/imagens/" ou "futebol/imagens/"
+ . public String getDirectory (): novo (p/ 'icomb/ui/TrataImagem.java')
+ . private static String clearDirectoryFromName (String fileXML): novo, devolve "baralho/imagens/" ou "futebol/imagens/"
+ . public void setArquivo (String directory, String arquivo):
+   + acresc. param. 'String directory,'
+
+- src/icomb/ui/ImagePanel.java
+ . public Image getElement (Universo universo, Element element): para pegar corretamente imagens do universo
+   + trocado 'nomeArquivo.substring(0,nomeArquivo.indexOf("/")) + "/imagens/";' por 'universo.getDirectory()' em 
+     'String dirImagens = universo.getDirectory();'
+
+- src/icomb/IComb.java:
+ . private void iniciaExercicio ():
+   + acresc. param. '"icomb/",' em 'ObjectManager.setMachine.setArquivoUniverso("icomb/", ArquivoUniverso);'
+
+
+- src/icomb/ui/ChooseUniversePanel.java
+ . public void actionPerformed (ActionEvent e):
+   + acresc. '"icomb/",' em 'uni.setArquivo("icomb/", universoFile);'
+
+- src/icomb/ui/DefinedUniversePanel.java:
+ . public void itemStateChanged (ItemEvent e):
+   + acresc. param. '"icomb/",' em 'uni.setArquivo("icomb/", strUniverse);'
+
+- src/icomb/util/GerenciadorRecursos.java
+ . public static String getPath (): novo, truque para pegar path completo do 'icomb/IComb'  (captura tb o 'bin' de 'java -cp bin ...')
+ . public static InputStream getInputStream (MontaFace mf,String nomeCompletoArquivo):
+   + para pegar caminho do 'icomb.IComb' acresc.
+     'String strPath = getPath();' para 'locationFile = new File(strPath + nomeCompletoArquivo);'
+     ate versao 0.8.8 estava: 'return Toolkit.getDefaultToolkit().getImage(((Class)classUniverse).getResource(nomeCompletoImagem));'
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . public void actionPerformed (ActionEvent e)
+   + int returnVal = fileChooser.showOpenDialog(this);
+   + acresc. 'ObjectManager.setMachine.setPath(file.getDirectory());'
+ + private String path = "";
+ . public void setUniversePath (String directory): novo, faz 'this.path = directory;'
+
+---
+Para tentar funcionar applet carregando 'cabecalho-icomb.gif' ou 'cabecalho-icomb_peq.gif'
+
+- src/base/MontaFace.java
+ . private void criaPainelSuperior ():
+   + trocado 'imagem_logo = icomb.ui.TrataImagem.pegaImagem(IMG_LOGO_SMALL);' por
+     'imagem_logo = icomb.util.GerenciadorRecursos.getImagem(this,IMG_LOGO_SMALL);'
+     e trocado 'imagem_logo = icomb.ui.TrataImagem.pegaImagem(IMG_LOGO);' por
+     'imagem_logo = icomb.util.GerenciadorRecursos.getImagem(this,IMG_LOGO);'
+
+- src/icomb/util/GerenciadorRecursos.java
+ . public static Image getImagem (MontaFace mf, String nomeCompletoImagem):
+   simplificacao: applet e aplicativo usar o mesmo codigo
+   + troquei 'if (mf.getApplet()!=null && IComb.isApplet())' com 'return mf.getApplet().getImage(mf.getApplet().getCodeBase(), nomeCompletoImagem);'
+     e 'else' com 'return icomb.ui.TrataImagem.pegaImagem(nomeCompletoImagem);', por apenas
+     'return GerenciadorRecursos.getImagemApplication(nomeCompletoImagem);
+   + x sob o 'else' de 'if (mf.getApplet()!=null && IComb.isApplet())', trocado 'return Toolkit.getDefaultToolkit().getImage(nomeCompletoImagem);'
+     x por 'return icomb.ui.TrataImagem.pegaImagem(nomeCompletoImagem);'
+
+---
+Auxiliar depuracao
+
+- src/icomb/IComb.java
+ + public static final boolean DEBUG = true: novo
+ + public static String debugMsg (Object obj): novo, para imprimir nome (com caminho) das classes em casos de erros (System.err.println)
+
+- src/icomb/ui/ImagePanel.java
+ . public Dimension getSize (): usando 'System.err.println(icomb.IComb.debugMsg(this) + "Erro: falta imagem para 'imgItemUniverso' "+nome);'
+ . public Dimension getPreferredSize (): usando 'System.err.println(icomb.IComb.debugMsg(this) + "Erro: painel imagem: getPreferredSize: "+nome+": "+imgItemUniverso+": "+e);'		       
+
+---
+
+BUG: ao carregar applet SEM exercicio resultava erro (java.lang.NullPointerException: ... at icomb.objects.Universo.interpretaCondicao(Universo.java:243)
+
+- src/icomb/objects/Universo.java
+ . public static Condicao [] interpretaCondicao (String strCond):  
+   + para eliminar erro, acresc. no inicio 'if (strCond==null || strCond=="") return null;'
+
+- src/icomb/IComb.java
+ . void iniciaExercicio (): idem
+   + para eliminar erro, acresc. no 'else ' de 'if (respostaEnviada != null && !respostaEnviada.trim().equals(""))': 'if (solucao==null || solucao=="" || resposta==null || resposta=="") return;'
+ . void monta (): idem
+   + subordinei os comandos 'ObjectManager.setMachine.loadUniverso(montaFace); ObjectManager.setMachine.confirmaExercicio();' a
+     'if (solucao!=null && resposta==null)'
+
+---
+
+BUG: ao carregar applet SEM e criar exercicio, escolhendo universo => perdia endereco correto de 'trataClasse=class icomb.LocalizacaoImagens'
+
+- src/icomb/ui/TrataImagem:
+ . public static Image pegaImagem (String str_imagem): 
+   + deixei apenas um dos codigos de leitura, o que estava sob o 'if (IComb.isApplet())', e com pequeno acerto para resolver bug acima
+   + eliminei codigo de leitura que era para applet: 'else if ( (IComb.isApplet() && erro) || !IComb.isApplet() )' que usava 'image = (Toolkit.getDefaultToolkit().getImage((trataClasse != null ? trataClasse : (trataClasse = pegaClasse(ComponentImage))).getResource(str_imagem)));'
+
+- src/icomb/util/GerenciadorRecursos.java
+  . public static String getPath (): novo, truque para pegar path completo do 'icomb/IComb'  (captura tb o 'bin' de 'java -cp bin ...$
+ . public static InputStream getInputStream (MontaFace mf,String nomeCompletoArquivo):
+   + para pegar caminho do 'icomb.IComb' acresc. 'String strPath = getPath();'
+
+
+- src/icomb/ui/DefinedUniversePanel.java:
+ . public void itemStateChanged (ItemEvent e):
+   + acresc. 'icomb.util.GerenciadorRecursos.getPath(this) + ' em 'String strUniverse = icomb.util.GerenciadorRecursos.getPath(this) + icomb.util.Util.univSet1;'
+     pois linha abaixo 'uni = icomb.util.Parse.parseUniverso(strUniverse);' precisa do path completo (caso de applet construindo exercicio online)
+   + precisei assim fazer 'int index = strUniverse.lastIndexOf("icomb/"); if (index>0) strUniverse = strUniverse.substring(index+6, strUniverse.length());'
+
+---
+
+BUG: ao abrir applet com exercicio NAO estava corretamente definido o universo
+
+- src/icomb/IComb.java: acertando bug, ao abrir HTML com arquivo NAO estava definindo universo!
+ . public void init ():
+   + apos 'this.monta();', adicionado comando importante para definir universo 'if (resposta!=null) ObjectManager.setMachine.loadUniverso(this.montaFace);'
+
+---
+
+Falta internacionalizar
+
+- src/icomb/ui/ChooseUniversePanel.java
+ . public void actionPerformed (ActionEvent e):
+   'String strAjuda = "Acione o bot<E3>o \"Novo Est<E1>gio\" para iniciar constru<E7><E3>o. Para ver detalhes do Universo acione o bot<E3>o " + ...'
+
+---
+Indentacoes
+
+- src/icomb/objects/Element.java
+
+
+
+--------------------------------------------------------------------------------
+[12/06/2013]
+
+
+Versao 0.8.8
+
+Acerto para abrir mesmo com falta do arquivo.
+
+- src/icomb/IComb.java
+ . private void iniciaParam (): sob o 'if (isApplet)' acresc. 'if (solucao==null) { System.err.println("applet: empty file!"); return; }'
+   implementei 'iLM_PARAM_AssignmentURL' - iLM 2.0
+
+- src/icomb/util/Configuracoes.java: nova versao 0.8.8
+
+
+--------------------------------------------------------------------------------
+[05/09/2011]
+
+Seguranca: qdo JS nao consegue logo definir valor de parametro 'online'
+
+- src/icomb/IComb.java
+ . void getContentFromStr (String strContent): para evitar erro de HTML com JS que monta valores de 'tags'
+   + acresc. 'if (resposta.equals("@resposta@")) resposta = "-1";'                                     
+   + troquei 'online =  (String) hash.get("online") != null &&...' por 'String strOnline = (String) hash.get("online");... online = false;'
+ . void iniciaParam (): analogo ao anterior, 'online = getParameter("online")...' por 'String strOnline = getParameter("online"); if (strOnline!=null) ... online = false;'
+
+--------------------------------------------------------------------------------
+[26/08/2011]
+                                     
+Direct de Paris...
+Acerto para remover vigia 'try/catch'... icomb.ui.SetMachinePanel.setEnabledStartDUPanel
+
+- src/icomb/ui/SetMachinePanel.java                                   
+ . void setEnabledStartDUPanel (): removido o 'try/catch' com 'System.out.println(str.charAt(3))' dePanel.setEnabled();
+
+
+[20/07/2011]
+
+Versao 0.8.7
+Arrumado bug introduzido em 0.8.6: ao abrir arquivo (linha comando) dava erro ao tentar habilitar botão de "Iniciar" em
+'icomb.ui.SetMachinePanel: DefinedExercisePanel dePanel.setEnabled()' no 'icomb.ui.SetMachinePanel.setEnabledStartDUPanel()'
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . void loadExercise(): trocar de lugar 'ObjectManager.setMachine.loadUniverso(painelSetMachine.getMf())'?
+
+- src/icomb/machine/SetMachine.java
+ . void setExerciseInitiated (): novo, faz 'estado = ESTADO_EXERCICIO_CONFIRMADO;'
+ . boolean isExerciseInitiated (): novo, faz 'return estado == ESTADO_EXERCICIO_CONFIRMADO;'
+
+- src/icomb/IComb.java
+ . void main (String[] args):
+  + trocado 'applet.set_m_panel.getCePanel().loadText(file.getName(),strContent);' por 'if (strContent!=null && strContent!="") { applet.getContentFromStr(strContent); ObjectManager.setMachine.setExerciseInitiated();'
+  + alterado posição de 'applet.iniciaExercicio(); applet.monta(); appletFrame.pack();'
+
+---
+Bug de nao habilitar botao para ler arquivo quando aplicativo
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . ChooseExercisePanel (SetMachinePanel pai): trocado 'if (IComb.isApplet())' para 'if (!IComb.isApplet())'
+
+---
+Acerto imagens
+
+- src/icomb/img: novo
+- src/icomb/img/cabecalho-icomb.gif: alterado, eliminado texto fixo "Combinatória Interativa"
+- src/icomb/img/cabecalho-icomb_peq.gif: eliminado em favor de
+- src/icomb/img/cabecalho-icomb_small.gif:
+
+- src/base/MontaFace.java
+ . trocados nomes, para 'IMG_LOGO = "img/cabecalho-icomb.gif", IMG_LOGO_SMALL = "img/cabecalho-icomb_small.gif";'
+
+---
+Acertos em codigo originado no iGraf
+
+- src/icomb/img/: novo diretório, para imagens
+- src/icomb/img/icomb_header.gif: novo, substitui 'cabecalho-icomb.gif' em 'base/MontaFace.java'
+
+- src/base/MontaFace.java
+ + eliminados: 'public TextField edicao = new TextField();', 'edicao.addKeyListener(this); (completaMontaFace(...))'
+ + eliminados métodos: 'setTextoAreaEdicao(String text)', 'TextField getEdicao()' e 'void linhaDois()'
+
+- src/icomb/util/Configuracoes.java
+ . ALT_LOGO = 36: era 42 (usada em 'base.MontaFace')
+ . DARK_BLUE2BG: nova, para fundo de janela de teste ('icomb.util.Util.createDialog(...)')
+ . corBarraSupInf: era (32,64,128), passei para (0,50,100) = HTML:00,32,64
+ . COR_AZUL deixei de usar em favor de 'DARK_BLUE2BG' (era 'corBarraSupInf')
+
+- src/icomb/ui/CreateExercisePanel.java
+ . void paint (Graphics g): troquei com de letra de 'COR_AZUL' para 'corBarraSupInf' (painel de enunciado/dica de exercicio)
+
+---
+Trocar 'Configuracoes.COR_AZUL' por 'Configuracoes.FACE_DARK1'
+
+- src/icomb/util/Configuracoes.java
+ . FACE_DARK1 = new Color(0, 50, 100); FACE_CLEAR1= = Color.white: novos
+ . CLEAR_BG1 = Color.white
+
+- src/icomb/ui/DrawingPanel.java
+ . void paint (Graphics g): 'goff.setColor(...)' -> 'goff.setColor(Configuracoes.FACE_DARK1)' (cor texto de msg sobre clicar p/ obter exemplo de instancia nova)
+- src/icomb/ui/ChooseExercisePanel.java
+ . void paint (Graphics g): idem - painel de escolha de exercicio (selecionar arquivo)
+
+- src/icomb/ui/StagePanel.java
+ . 8 trocas de 'COR_AZUL' para 'FACE_DARK1'
+ . void paint (Graphics g): 'g.setColor(Configuracoes.COR_AZUL)' -> 'g.setColor(Configuracoes.FACE_DARK1)' - mas NAO identifiquei onde aparece o "Stage"!!!
+
+- src/icomb/ui/VerticalPanel.java
+ . void paint (Graphics g): 'g.setColor(Configuracoes.COR_AZUL)'->'g.setColor(Configuracoes.FACE_DARK1)'; 'I18n.getInstance().getString(title)'->'I18n.getString(title)' - mas NAO identifiquei onde aparece o ""!!!
+ 
+- src/icomb/util/Util.java
+ . static void createDialog (String strTitle, java.awt.Frame jFrame, String strMessage): troquei 'jdialog.setBackground(Configuracoes.COR_AZUL)' por 'jdialog.setBackground(Configuracoes.DARK_BLUE2BG)'
+
+- src/icomb/components/CustomChoice.java
+ . comentarios
+
+- src/base/EsquemaVisual.java
+ . static final Color corAcesa  = Configuracoes.FACE_CLEAR1: era 'Color.green' ao passar mouse sobre item de ajuda
+
+- src/ajuda/visao/navegador/HelpButton.java
+ . void mouseEntered (MouseEvent e): 'setForeground(Color.green)' -> 'setForeground(Configuracoes.FACE_CLEAR1)'
+
+- src/ajuda/visao/navegador/NavigatorLabel.java
+ 3 'corFundoBotoes' -> 'DARK_BLUE2BG'
+ . void esquemaPadrao (): 'setForeground(corLetrasBotoes)' -> 'setForeground(Configuracoes.FACE_CLEAR2)'
+ . selecionaLabel (int i): 'setBackground(Color.white)' -> 'setBackground(Configuracoes.CLEAR_BG1)'; 'setForeground(corFundoBotoes)'->'setForeground(Configuracoes.DARK_BLUE2BG)'
+ . void mouseEntered (MouseEvent e): 'setForeground(Color.green)' -> 'setForeground(Configuracoes.FACE_CLEAR1)'
+
+- src/ajuda/visao/navegador/LinearNavigator.java
+ 4 'I18n.getInstance().getString(...)'->'I18n.getString(...)'
+ . void actionPerformed (ActionEvent e): qdo ingles/fr nao funcionava, 'Voltar,Avançar,Início,Imprimir' -> 'helpButtonBack,helpButtonGo,helpButtonStart,helpButtonPrint'
+
+- src/ajuda/visao/componentesDoTexto/Topico.java
+ . void paint (Graphics g): 'g.setColor(corLetras)' -> 'g.setColor(Configuracoes.FACE_CLEAR1)'
+
+- i18n_*.properties
+ . help1p1: melhorado texto
+
+---
+Eliminei blocos comentados
+- src/icomb/events/ObjectManager.java
+
+
+
+[12/07/2011]
+
+Versao 0.8.6
+
+Detalhe: ao carregar applet sem parametro 'lang' (contruia 'java.util.ResourceBundle' com 'nu_BR', vindo de "null")
+
+- src/icomb/util/I18n.java
+  comentarios
+
+- src/icomb/IComb.java
+ . void iniciaParam (): acresc. 'String strParamAux=getParameter("lang")', troquei 'if (strLang!=null)' por 'if (strParamAux!=null)' e acresc. 'else'
+
+---
+Evitar botao de abrir arquivo qdo "applet"
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . ChooseExercisePanel (SetMachinePanel pai): (ERRO) acresc. 'if (IComb.isApplet())' para 'openFile.addActionListener(this); panelButtons.add(openFile, BorderLayout.NORTH)'
+
+---
+- src/icomb/IComb.java
+ Internacionalizar: troquei 'ehApplet' por 'isApplet': 11 ocorrencias
+
+- src/icomb/ui/SetMachinePanel.java: 1
+- src/icomb/ui/ChooseExercisePanel.java: 1
+- src/icomb/util/I18n.java: 1
+- src/icomb/util/GerenciadorRecursos.java: 1
+- src/icomb/ui/TrataImagem.java: 7
+- src/base/MontaFace.java: 1 + 'boolean ehApplet = false' => 'boolean isApplet = false'
+
+
+
+
+
+[11/07/2011]
+
+Versao 0.8.5
+
+Problema: ao carregar exerc. via applet, o botao de "Iniciar" estava desabilitado
+- src/icomb/machine/SetMachine.java
+ . void setUniverso (Universo universo): tiver que acresc. 'if (universo!=null) ObjectManager.getInstance().getSetMachinePanel().setEnabledStartDUPanel();'
+
+- src/icomb/ui/SetMachinePanel.java
+ . void setEnabledStartDUPanel (): novo, faz 'dePanel.setEnabled();' para 'src/icomb/machine/SetMachine.java' poder habilitar botao Iniciar de 'DefinedExercisePanel dePanel'
+
+   
+[04-05/07/2011]
+
+Versao 0.8.4
+
+---
+IMPORTANTE
+Acerto de numero de elementos em estagio que era estragado ao inserir novos estagios - o 'SetMachine.defineNeP(int,int)' era disparado indevidamente
+- src/icomb/ui/StagePanel.java
+ . void itemStateChanged (ItemEvent evt): para melhorar desempenho e evitar erro de "estragar cardinalidade de estágios anteriores",
+   eliminar chamada de 'ObjectManager.setMachine.defineNeP(chN.getSelectedKey(),chP.getSelectedKey())' - que invoca 'java.lang.Integer.parseInt(String)'
+   em 'if (evt.getSource()==chN || evt.getSource()==chP)' acresc. 'if (!chN.getSelectedKey().equals("chooseOption") || !chP.getSelectedKey().equals("chooseOption"))'
+
+---
+IMPORTANTE
+Acertar o painel 'StagePanel': o botão 'btnAddStage("Adicionar Estágio")' estava ficando sobre o choice/painel de selecionar "Formula"
+no segundo estágio, o painel para fórmula (StagePanel.panelFormula) entrava truncado e aparecia o "Adicionar Estágio"
+
+- src/icomb/ui/StagePanel.java
+ . void verifyStage():
+    + 'panelFormulaCancel.setVisible(false)' no lugar de 'panelFormulaCancel.setVisible(true)' por aqui panelFormula="<Formula <choose> [Ok]"
+    + adicionado 'panelFormula.remove(panelFormulaCancel)'
+  . void actionPerformed (ActionEvent evt)
+    + else if (evt.getSource() == btnOk): adicionados 'panelFormula.remove(panelFormulaEdit); btnAddStage.setVisible(true);' ('panelValStage.add(btnAddStage)')
+    + else if (evt.getSource() =
+
+- src/icomb/ui/ListPanel.java
+ . Dimension getPreferredSize (): para permitir ver mais estagios e botao selecionar "somar,mult.", de 70 para 75 em 'return new Dimension(Constants.PANEL_WIDTH-10, 75)'
+ . ListPanel (ConstructionPanel pai):
+  + novo 'Panel panelExcludeOrFinal = new Panel(new BorderLayout());...'
+  + troquei nome de Panel 'panel' por 'panelRight'
+  + troquei 'southPanel.add(btnSupressSelection,BorderLayout.NORTH), southPanel.add(chAction,BorderLayout.CENTER), southPanel.add(panelRight, BorderLayout.SOUTH)'
+    por 'panelExcludeOrFinal.add(btnSupressSelection,BorderLayout.NORTH), panelExcludeOrFinal.add(chAction, BorderLayout.SOUTH), southPanel.add(panelExcludeOrFinal,BorderLayout.NORTH)'	    
+
+- src/icomb/ui/ConstructionPanel.java
+ . void stageWasDeleted (): ao remover estagio anterior, desabilitar o botao de "Reiniciar", acresc. 'painel_nsbp.enabledResetConstruction(false)'
+
+- src/icomb/ui/NewStageButtonPanel.java
+ . void enabledResetConstruction (boolean bool): novo, 'btnResetConstruction.setEnabled(bool);'
+
+
+---
+Nao resultar erro 'java.util.NoSuchElementException' ao clicar em "Reinicia"
+- src/icomb/ui/ListPanel.java
+ . void addStageFromConstructionPanel (): troquei 'stage = ((Estagio)...).lastElement()' por 'Vector vec = ... if (vec != null && vec.size()>0) stage=(Estagio) vec.lastElement(); else return;'
+
+
+---
+- src/icomb/objects/Estagio.java
+  7 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+  AQUI ESTA A CONSTRUCAO DAS MSG DE ESTAGIOS FINAIS???
+
+---
+Acerto em cores de fundo (problema de tratamento distindo de heranca em versoes JVM - no BlackDown 1.4 gera problema)
+- src/icomb/ui/DefinedUniversePanel.java
+ . DefinedUniversePanel (SetMachinePanel pai): para deixar fundo cinza-padrao em painel e botao, eliminei 'panelButtons.setBackground(Configuracoes.corBarraSupInf)'
+
+---
+Acertos usabilidade: nao permitir trocar universo em exerc. pronto, carregado
+- src/icomb/ui/DefinedUniversePanel.java
+ . void setEnable (): novo, faz 'btnUniverso.setEnabled(true)' para SetMachinePanel.void update(): if (estadoAtualMachine==SetMachine.ESTADO_EXERCICIO_CONFIRMADO)
+ . DefinedUniversePanel (SetMachinePanel pai): acresc. 'if (!ObjectManager.setMachine.isModoCriacao()) choiceUniverses.setEnabled(false);' apos definir 'choiceUniverses'
+
+- src/icomb/machine/SetMachine.java
+ . boolean modoCriacao: passei para privado p/ evitar acessos diretos
+ . void notExerciseCreation (): faz 'modoCriacao = false', importante para desbilitar troca de universo qdo da leitura de exercicio via aplicativo
+ . void confirmaExercicio (): acresc. 'modoCriacao = true', para definir ser exerc. qdo leitura (via 'src/icomb/ui/ChooseExercisePanel.loadExercise()')
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . void loadExercise ():
+  + desabilitar troca de universo: acresc. 'ObjectManager.setMachine.notExerciseCreation()' antes de 'redraw()'
+  + habilitar botao "Iniciar":
+
+---
+Habilitar/desabilitar botao 'DefinedExercisePanel.btnIniciar'
+- src/icomb/ui/DefinedExercisePanel.java
+ . public void setEnabled (): novo metodo, que faz 'btnIniciar.setEnabled(true);'
+ . public void setDisabled (): novo metodo, que faz 'btnIniciar.setEnabled(false);'
+
+- src/icomb/ui/DefinedUniversePanel.java
+ . void itemStateChanged (ItemEvent e):
+   * if (e.getSource() == choiceUniverses): 'pai.getDePanel().setEnabled()' acresc. p/ habilitar 'Iniciar' em 'DefinedExercisePanel'
+pai.getDePanel().setEnabled()
+
+- src/icomb/ui/SetMachinePanel.java
+ . public ChooseExercisePanel getCePanel (): 'return cePanel', novo p/ ''
+ . public DefinedExercisePanel getDePanel (): 'return dePanel', novo p/ 'DefinedUniversePanel.itemStateChanged(ItemEvent)'
+ . void update (): disabled='dePanel.setDisabled()'; enable='dePanel.setEnabled()'
+   * estadoAtualMachine==SetMachine.ESTADO_ESCOLHENDO_EXERCICIO: (1) 'dePanel = null' (acresc. para certificar nao haver DefinedExercisePanel)
+   * estadoAtualMachine==SetMachine.ESTADO_CRIANDO_EXERCICIO: (-1) 'dePanel = null' (acresc. para certificar nao haver DefinedExercisePanel)
+   * estadoAtualMachine==SetMachine.ESTADO_EXERCICIO_CONFIRMADO: (2) 'if(ObjectManager.setMachine.getUniverso()!=null) dePanel.setEnabled() else dePanel.setDisabled()'
+   * estadoAtualMachine==SetMachine.ESTADO_CONSTRUCAO_INICIADA: (3) disabled ??
+   * estadoAtualMachine==SetMachine.ESTADO_OPERACAO_DEFINIDA: (7) 
+   * estadoAtualMachine==SetMachine.ESTADO_VALIDA_CONSTRUCAO: (8) disabled ??
+   * estadoAtualMachine==SetMachine.ESTADO_CONSTRUCAO_FINALIZADA: (9) disabled ??
+
+  + para desabilitar botao 'Iniciar': por padrao, logo no inicio deste metodo 'dePanel.setDisabled()'
+  + para habilitar botao 'Iniciar', em 'estadoAtualMachine'
+
+
+src/icomb/ui/SetMachinePanel: DefinedExercisePanel dePanel
+
+---
+Melhorar msg de universos
+- src/icomb/util/Util.java
+ 4 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+ . Acresc. nomes para universos (nao ficando os nomes de arquivos "nao amigavel"): 'String univNameSet1, univNameSet2' respectivamente para 'I18n.getString("universeDeck")' e 'I18n.getString("universeFoot")'
+   usados em 'icomb.ui.DefinedUniversePanel.itemStateChanged(DefinedUniversePanel.java:135)'
+
+- src/icomb/ui/DefinedUniversePanel.java
+ . void itemStateChanged (ItemEvent e):
+  + acresc. 'String strUniverse=icomb.util.Util.univSet1; if(setChoosen.equals(I18n.getString("univNameSet2"))) strUniverse=icomb.util.Util.univSet2; uni=icomb.util.Parse.parseUniverso(strUniverse);'
+  + troquei 'uni.setNome(setChoosen); uni.setArquivo(setChoosen);' por 'uni.setNome(strUniverse); uni.setArquivo(strUniverse);'
+
+- i18n_*.properties
+ . novos: universeDeck=Universe: card deck - file "baralho/baralho.xml"; universeFoot=football teams - file "futebol/futebol.xml"
+
+---
+Simplificar anotar texto na area inferior do "painel de estagios" - nao precisa mais fazer 'for'
+- src/icomb/ui/ListPanel.java
+ . void redo (): haviam 2 chamadas dele, eliminei a que apenas inseria o ultimo estagio preparado 
+ . void addStageFromConstructionPanel (): novo, sem fazer 'for', apenas adiciona ultimo com '(Estagio) ObjectManager.setMachine.getEstagios().lastElement()'
+
+- src/icomb/ui/ConstructionPanel.java
+ . void addStagePanel (): troquei 'painel_lp.redo()' por 'painel_lp.addStageFromConstructionPanel()' - que eh mais economica...
+
+---
+Para ficar mais claro
+- src/icomb/formula/Formula.java
+ . static Formula getStaticMapFormula (String name): troquei nome, de 'getStaticMapFormula' para 'getStaticMapFormula', pois devolve 'return (Formula) mapFormula.get(name)'
+- src/icomb/ui/SetMachinePanel:
+ . void setFormulaAtual (String strFormula): troquei 'formulaAtual=Formula.getFormulaInstancia(strFormula)' por 'formulaAtual=Formula.getStaticMapFormula(strFormula)'
+
+
+---
+Para depuracao
+- src/icomb/components/CustomChoice.java
+ . void listCustomChoice (): para depuracao, lista todos 'key,value'
+			    
+---
+
+FALTA: 
+ 1. "validar estagio" => falta tirar o botao "adicionar estagio"
+    apos "validar estagio", choice/painel "Formula ..." fica abaixo do "adicionar estagio"
+    apos escolher tipo de "Formula" o "adicionar estagio" eh eliminado!
+
+
+---
+Button btnIniciar de 'startExercise'="iniciar"
+ + btnIniciar.setEnabled(true):
+   * src/icomb/ui/DefinedUniversePanel.itemStateChanged(ItemEvent e); src/icomb/ui/ChooseExercisePanel.loadExercise()
+   * src/icomb/ui/SetMachinePanel.void update(): se 'ObjectManager.setMachine.getUniverso()!=null'
+ + btnIniciar.setEnabled(false): 
+   * src/icomb/ui/SetMachinePanel.void update(): por definicao (logo inicio do metodo)
+
+
+
+[04/07/2011]
+
+Versao 0.8.3
+
+---
+Para carregar universo
+- src/icomb/machine/SetMachine.java
+ . void loadUniverso (MontaFace mf): para facilitar depuracao, acresc. ',this.arquivoUniverso' como ult. param. de 'uni = Parse.parseUniverso(...)'
+
+- src/icomb/util/Parse.java
+ . static Universo parseUniverso (String nomeDoArquivo): acresc. ',nomeDoArquivo' em 'return parseUniverso(is, nomeDoArquivo)'
+ . static Universo parseUniverso (InputStream is, String univFileName): acresc. ultimo parametro 'univFileName'
+ . static Universo load (InputStream is, String univFileName): acresc. ultimo parametro 'univFileName'
+
+- src/icomb/ui/ChooseUniversePanel.java
+ 8 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)' 
+ . void actionPerformed (ActionEvent e): acresc. ',universoFile' como ult. param. em 'uni=Parse.parseUniverso(..., universoFile)'
+
+- src/icomb/util/Util.java
+ . static Vector geUniversetList (): novo, devolve 'Vector' com "baralho/baralho.xml" e "futebol/futebol.xml"
+
+- src/icomb/ui/DefinedUniversePanel.java
+ . private CustomChoice choiceUniverses: novo
+ . DefinedUniversePanel (SetMachinePanel pai): 'choiceUniverses=ObjectManager.criaCombo(panelButtons, Util.geUniversetList(), "changeUniverse")'
+ . void itemStateChanged (ItemEvent e): novo, para tratar 'choiceUniverses'
+
+- src/icomb/machine/SetMachine.java 
+ . public void setUniverso (Universo universo): era privado, agora 'src/icomb/ui/DefinedUniversePanel.java' via 'actionPerformed(ActionEvent)' precisa
+
+---
+Permitir gravar novo exercicio
+
+- src/icomb/util/Configuracoes.java
+ . static final String fileICombMark = "# iComb: http://www.matematica.br": novo
+
+- src/base/MontaFace.java
+ . public static boolean staticApplet: novo
+ . MontaFace (Applet applet, boolean ehApplet): acresc. 'staticApplet' em 'this.ehApplet = staticApplet = ehApplet;'
+ 
+- src/icomb/ui/SetMachinePanel.java 
+ . void criarExercicio (): envia POST com 'String enderecoPost = applet.getParameter("MA_PARAM_addresPOST");'
+   + precisa colocar parametro para decidir se faz ou nao a troca de pagina em 'ObjectManager.getInstance().trocaFrame(null)'
+     atualmente nao esta fazendo nada...
+ . void verificaResposta (): melhorar o cod. eleminando prefixo 'ObjectManager.setMachine.' de 'if (!(getResultadoFinal()==getExercicioAtual().getExercicioAtual().getResposta()))'
+
+- src/icomb/util/Util.java
+ . static String getUserSystemData (): novo, gerar dados de usuario para grava-los com arquivo
+ . static void storeFile (String fName, String strContent, String msgTracking): novo
+
+- src/icomb/ui/ConstructionPanel.java
+ . boolean criarExercicio (): inclui 'if (icomb.events.ObjectManager.setMachine.isModoCriacao()) {...}' para tratar criacao de exercicio
+
+- src/icomb/ui/SetMachinePanel.java
+ . void sent2Server (): alterei nome, para fazer POST, era 'criarExercicio()' assim nao confunde com a 'criarExercicio()' de 'src/icomb/ui/ConstructionPanel.java'
+
+- src/icomb/IComb.java                                                                                                                               
+ . static final Frame appletFrame=new Frame("iComb"): novo
+ . static void main (String[] args): eliminei 'Frame appletFrame = new Frame("iComb");' jah que agora eh estatico
+
+- i18n_*.properties
+ + alterei: send=Avaliar SoluÃ§Ã£o -> exerciseSend=Envia solucao / exerciseSave=Gravar SoluÃ§Ã£o
+ + faltavam no "fr_FR":red=red; black=black; startExercise=Start; clue=Tip; solve=Solve Exercise; help=Help; seeUniverse=Show Universe
+
+---
+Definir o conjunto Universo num novo exercicio
+
+- src/icomb/machine/SetMachine.java
+ . void setUniverso (Universo universo): para def. universo em const. de exerc, acresc. 'else { if (universo!=null) this.arquivoUniverso=universo.getArquivo();}'
+
+- src/icomb/ui/SetMachinePanel.java
+ . static String staticErrSent: novo, para anotar tipo do erro
+ . boolean criarExercicio ():
+  + era 'void', acresc. 'return true' e 'staticErrSent = e.toString();' ao final
+  + no 'catch (Exception e)' acresc. 'return false;' (agora nao chega no 'ObjectManager.getInstance().trocaFrame(null)')   
+
+- src/icomb/ui/ConstructionPanel.java
+ . boolean criarExercicio (): era 'void', acresc. 'return painelSetMachine.criarExercicio()'
+
+- src/icomb/ui/ConstructionFooterPanel.java
+ . boolean criarExercicio (): era 'void', acresc. 'return pai.criarExercicio();'
+
+- src/icomb/ui/NewStageButtonPanel.java
+ . void actionPerformed (ActionEvent e): em 'if (ObjectManager.setMachine.isModoCriacao())'
+
+- i18n_*.properties
+ + msgLMSsuc_sent=ConstruÃ§Ã£o enviada com sucesso!
+ + msgLMSfail_sent=A construÃ§Ã£o nÃ£o pode ser enviada!
+
+---
+- i18n_*.properties
+ + nao traduzidas: evaluationMessage01; evaluationMessage02; evaluationMessage03; ... evaluationMessage11
+   passei para Ingles, mas falta Frances
+
+---
+Indentacao
+- src/icomb/ui/ListPanel.java: 18 ocorrencias de 'I18n.getInstance().getString("...")' por 'I18n.getString("...")'
+
+
+[30/06 - 03/07/2011]
+
+Versao 0.8.2
+
+Problema de erro ao tentar resolver 'exercicio5.cmb': após digitar estágio com erro (não selecionava nenhum elemento), caia numa msg vazia
+
+- src/icomb/ui/StagePanel.java 
+ . void verifyStage (): 
+  + mudei msgs, mas eh essencial manter o 'catch (RuntimeException e)' -> tratar exc. lancada por 'Avaliador.java'
+  + acresc. 'strError = e.getMessage(); if (strError==null)' para pegar erro ocorrido dentro de 'Avaliador.adicionaCondicao(...)'
+    ao menos detectei 'elemento do univ.' q/ NAO satisfaz qq condicao => este elemento NAO deveria ser sel. => o estagio esta errado, informe aluno
+
+- src/icomb/objects/Expressao.java:
+ . String toString (): novo, 'return attributeName+": "+(belong?"in":"not in")+elements;'
+
+---
+
+- src/icomb/erro/Avaliador.java
+ ultimo de:  8365 Jul 24  2009
+ troquei n ocorrencias de 'I18n.getInstance().getString("...")' por 'I18n.getString("...")'
+ . void adicionaCondicao (Condicao condicao): // acresc. 'try/catch' em 'while (it.hasNext())'
+
+- src/icomb/objects/Condicao.java: indentacao
+
+- i18n_*.properties
+ + back2start=Voltar; back2start=Back; back2start=Retour
+ + 'back2start-dica=Voltar ao inicio', 'back2start-dica=Back to start', 'back2start-dica=Retour au dÃ©but' ou 'Recomencer l'exercise'?
+ + createAnswer-dica=Construir o gabarito do exercÃ­cios (um modelo de estÃ¡gios que o resolve)
+
+- src/icomb/ui/ConstructionFooterPanel.java
+ varias trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+ . void actionPerformed (ActionEvent e): falta tratar: e se for criacao de exercicio? e se for aplicativo, gravar?
+
+- src/icomb/ui/ChooseExercisePanel.java
+ Trocado botao 'Criar exercicio' por 'Voltar'
+ Eliminado botao "Validar" e acrescentado "Criar exercicio"
+ 7 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+ . ChooseExercisePanel (SetMachinePanel pai): troquei botao de "Criar exercicio" por "Voltar"
+  + eliminei 'buttonValidate = ObjectManager.criaBotao(panelButtons,I18n.getString("validateExercise"),...); buttonValidate.addActionListener(this); panelButtons.add(buttonValidate, BorderLayout.SOUTH);'
+  + acresc. 'panelButtons.add(btnCriar, BorderLayout.SOUTH);' apos criar 'btnCriar = ObjectManager...'
+ . void actionPerformed (ActionEvent e):
+  + eliminei 'if (e.getSource() == buttonValidate)' (que agora passaria a ter codigo 'loadExercise();')
+  + acresc. 'if (e.getSource() == btnCriar)' para tratar novo botao "Criar exercicio"
+  + acresc. 'loadExercise()' ao final de 'if (e.getSource() == openFile)'   
+ . void private loadExercise (): novo, com codigo para carregar exercicio
+
+- src/icomb/ui/CreateExercisePanel.java
+ 5 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+ . Button btnBack: novo
+ . CreateExercisePanel (SetMachinePanel pai): 'btnHelp = new Button("Ajuda");' por 'btnHelp = ObjectManager.criaBotao(panelButtons, I18n.getString("help"), I18n.getString("help-dica"));'
+ . void actionPerformed (ActionEvent e):
+  + para tratar novo botao "voltar", acresc. 'else if (e.getSource()==btnBack) { ObjectManager.setMachine.reinicia(); pai.redraw(); }'
+  + em 'else if (e.getSource()==btnIniciarResolucao)': universo NAO def., logo comentado 'ObjectManager.setMachine.loadUniverso(pai.getMf())'
+
+- src/icomb/ui/DefinedExercisePanel.java
+ Trocado botao 'Criar exercicio' por 'Voltar'
+ 8 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+ . DefinedExercisePanel (SetMachinePanel pai): agora eh chamado de 'SetMachinePanel.java' apos "zerar" 'exercicioAtual'
+  + acresc. 'tring strStatement = ""; if (ObjectManager.setMachine.getExercicioAtual()!=null)...'
+  + trocado 'btnCriar = ObjectManager.criaBotao(...)...' por 'btnBack = ObjectManager.criaBotao(...)...'
+ . void paint (Graphics g): idem, acresc. 'if' acima sob 'label.setText(ObjectManager.setMachine.getExercicioAtual().getLongDescription())'
+ . void actionPerformed (ActionEvent e):
+  + coloquei 'if (e.getSource() == btnBack)...' no lugar de 'if (e.getSource() == btnCriar) ...'
+
+- src/icomb/ui/SetMachinePanel.java
+ 9 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+ alterei nomes de 'cep,crp,dep,cup,dup,cp,vp,fp,dp' por 'cePanel, crePaneldePanel, cuPanel, duPanel, cPanel, vPanel, fPanel, dPanel'
+ . void update (): nao eliminava painel 'CreateExercisePanel crePanel', entao, no 'if (ObjectManager.setMachine.getEstado()==SetMachine.ESTADO_INICIAL)'
+   + acresc. 'removeAllComponents()' e 'crePanel = null;'
+
+- src/icomb/machine/SetMachine.java
+ . void reinicia (): novo, a ser chamado de 'icomb/ui/CreateExercisePanel.actionPerformed(ActionEvent)'
+ . void setExercicio (Exercicio ex): colocado 'estado=ESTADO_EXERCICIO_CONFIRMADO', estava 'ESTADO_ESCOLHENDO_EXERCICIO' (que NAO eh inicio de estagios)
+
+---
+Leitura de arq. via linha de comando
+
+- src/icomb/util/GerenciadorRecursos.java
+ . static String clearFileName (String nome): novo
+ . static boolean isFile (String name): novo
+ . static String getFileName (): novo, faz 'return fileName;'
+ . static java.io.File getFileArg (String [] args): novo, copia a versao que tinha feito para o iVprog
+ . static String getStringFile (java.io.InputStream inputStream, String strURL): novo
+
+- src/icomb/IComb.java
+ . void getContentFromStr (String strContent): novo, cod. veio de 'iniciaParam()'
+ . void iniciaParam (): troquei codigo por 'getContentFromStr(MA_proposition);'
+ . static String lerDeURL (java.applet.Applet applet, String strURL): troquei codigo por 'return icomb.util.getStringFile(inputStream);'
+
+- src/icomb/ui/SetMachinePanel.java
+ . ChooseExercisePanel getCePanel (): novo, para 'IComb.main(...)', faz 'return cePanel'
+
+- src/icomb/ui/ChooseExercisePanel.java
+ . void loadText (String strName, String strContent): novo, define dados e faz 'loadExercise()'
+
+---
+Ao voltar de um exerc. que ja tenha ido ate o final (com cartas no DrawingPanel) => deve limpar estar
+
+- src/icomb/ui/DrawingPanel.java
+ 1 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+ . DrawingPanel (MontaFace mf): troquei 'recalcula();' por 'hand = new Element[0];' para assegurar que na primeira vez nunca tenha "solucao"        
+
+- src/icomb/machine/SetMachine.java
+ Precisa "zerar" 'Vector estagios', c.c., 'DrawingPanel.recalcula()' continuara reconstruindo 'Element[] hand'
+ . SetMachine (): troquei parte final de codigo por 'reinicia()'
+ . void reinicia ():  precisa acresc. 'estagioAuxiliar = null;' para apagar eventual estagio jah registrado em sol. anterior
+ . void setUniverso (Universo universo): acresc. 'reinicia();' para assegurar "zerar" 'Vector estagios'
+
+Estendem 'src/icomb/ui/VerticalPanel.java': src/icomb/ui/SetMachinePanel.java; src/icomb/ui/ConstructionPanel.java
+
+---
+Remover a ultima popup (mesmo que tenha ficado fora de foco, p.e., embaixo de uma lista tipo 'select')
+
+- src/icomb/ui/ToolTip.java
+ . static ToolTip staticToolTip: novo, para armazenar ultima popup lancada
+ . public void removeLastToolTip (): novo
+ . void mouseEntered (MouseEvent me): acresc. 'removeLastToolTip();' para forcar remover ultima popup
+
+- src/icomb/events/ObjectManager.java
+ private static ToolTip staticToolTip: acresc. para remover PopUp qdo ela sobrava na tela (princ. em choices), remove ao entrar na seguinte
+ . Button criaBotao (Component pai, String texto, String tooltip): acresc. 'if (staticToolTip!=null) staticToolTip.removeToolTip(); staticToolTip =...'
+ . CustomChoice criaCombo (Component pai, Vector keys, Vector values, String tooltip): acresc. 'if (staticToolTip!=null) staticToolTip.removeToolTip(); staticToolTip =...'
+
+
+---
+Indentacao
+- src/icomb/ui/VerticalPanel.java
+- src/icomb/ui/DefinedUniversePanel.java: 8 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)' 
+- src/icomb/events/ObjectManager.java  
+- src/icomb/ui/VerticalPanel.java                                                                                                 
+- src/icomb/machine/SetMachine.java
+- src/icomb/ui/ToolTip.java
+- src/icomb/ui/ValidationPanel.java: 4 trocas de 'I18n.getInstance().getString(...)' por 'I18n.getString(...)'
+
+Eu Terminei
+
+
+---
+- src/icomb/util/I18n.java
+ . static String getString (String key, Object[] parametros): passei para estatico
+
+
+[30/05/2011]
+
+Versao 0.8.1
+
+Problema de carga de imagens qdo aplicativo, tentava carragar via 'getCodeBase()' de "applet"
+- src/icomb/util/GerenciadorRecursos.java
+ . static Image getImagem (MontaFace mf,String nomeCompletoImagem): acresc. ' && IComb.ehApplet()' em 'if (mf.getApplet()!=null && IComb.ehApplet())'
+
+Detalhe provocado pelo erro acima
+- src/icomb/ui/ImagePanel.java
+ . Dimension getSize (): por seguranca acresc. 'if (imgItemUniverso==null) {... return null; }'
+
+- src/icomb/util/Configuracoes.java: núm. de versão -> 0.8.1
+
+
+[27/03/2011]
+
+Versoa 0.8
+
+- src/base/MontaFace.java
+  www.matematica.br
+   Gera icones:
+    * Definicao:
+      + cabecalho-icomb.cxf:
+       - tamanho: 741 x 32
+       - cores: cor fundo azul escuro = #003264 = 0,50,100
+       - fonte: "Sans 18 px"
+
+      + cabecalho-icomb_peq.cxf:
+       - tamanho: 542 x 32
+
+      + cabecalho-icomb_*.cxf: 
+       - tamanho: 222 x 18
+       - cores: branco sobre cinza (#989998 = 152,153,152)
+       - fonte: "Sans 18 px"
+
+    + cabecalho-icomb_pt.cxf -> cabecalho-icomb_pt.gif
+      Combinatória Interativa
+    + cabecalho-icomb_en.cxf -> cabecalho-icomb_en.gif
+      Interactive Combinatory
+    + cabecalho-icomb_fr.cxf -> cabecalho-icomb_fr.gif
+      Combinaison Interactive
+
+    + cabecalho-icomb_peq.gif
+
+Problemas:
+- icomb/ui/StagePanel:
+ . void verifyStage () -> dim. de botao "Validar estagio" esta tendo dim. alterada (ao clicar "Adicionar estagio")
+ . nao coloca cores coretas em 'CustomChoice' em
+   carregaAtributos(icomb.objects.Universo universo)
+   Panel secondLine ():
+
+- src/icomb/events/ObjectManager.java
+ . static CustomChoice criaCombo(...)
+
+
+Metas:
+- reduzir altura economizando em posicionamento de botoes 
+ + "Apagar este estágio" -> ficar no topo do painel, mesmo nivel de tít. "Estágio"
+ + "Excluir seleção" -> descer, ficando no mesmo nível de 'choice' de "Lista de estágios"
+                        com isso o 'TextField' pode almentar num. de colunas e talvez reduzir linhas...
+ + "Eu terminei" -> subir este botao, ele poderia ficar no mesmo nivel do botao
+                    "Novo estágio" ou talvez fique melhor junto aos "botoes principais" no primeiro
+   painel (o do "Exercícios"). Ele poderia até substitui o "Iniciar", ao
+   iniciar, trocar para "Finalizar" (como o botão de "disparar/anotar" script no iGeom)
+
+[2011/03/27] 0.8.5
+
+- src/icomb/util/Configuracoes.java
+ . comentarios em 'int lTFP, aTFP'
+ . public static final int lTFP = 750: era '828'
+
+- src/icomb/util/Constants.java
+ . static int PANEL_WIDTH = 700: estava 650, antes 550 (dependendo da resulucao de tela a linha 1 com 2 choices nao cabia)
+
+- src/icomb/IComb.java
+ . int getLargura ():  de 'return Constants.PANEL_WIDTH;' para 'return Configuracoes.lTFP;'
+
+- src/base/EsquemaVisual.java
+ . static final Color corFundoEdicao, corLetras, corLetrasBotoes = Configuracoes.COR_AZUL: eram 'Color.white;' o CustomChoice na 'secondLine()' de 'icomb/ui/StagePanel' entrava c/ fundo cinza claro e este branco!
+
+- src/base/MontaFace.java
+ . northPanel = new Panel(): Dimension getPreferredSize (): 'Dimension(Constants.PANEL_WIDTH,Configuracoes.ALT_LOGO)'->'Dimension(Configuracoes.lTFP,Configuracoes.ALT_LOGO)'	
+ . void criaPainelSuperior (): 'northPanel.setSize(Constants.PANEL_WIDTH,Configuracoes.ALT_LOGO)' -> 'northPanel.setSize(Configuracoes.lTFP, Configuracoes.ALT_LOGO)'
+ . void setSize ():  def. <alt.x larg.> aplicativo, de 'Constants.PANEL_WIDTH,Configuracoes.ALT' para 'fr.setSize(Configuracoes.lTFP, Configuracoes.aTFP)'
+ . static void setSize (Frame fr): idem
+
+- src/icomb/ui/StagePanel.java
+ . Condicao criaCondicao (StringBuffer sb): " e " -> '" "+I18n.getString("msgE")+" "'
+
+- src/i18n_*.properties
+openFile-dica = Clique aqui para abrir nova arquivo iComb
+validateExercise-dica = ApÃ³s finalizar o exercÃ­cio, clique aqui para verificar validade da resposta
+
+
+[2011/03/25] 0.8.5
+
+Acertos em parâmetros para iMA: novas convenções (MA_propositionURL="true" => MA_proposition contém URL e não envia resposta)
+
+- src/icomb/util/Constants.java
+ . public static int PANEL_WIDTH = 650: era 550
+
+- src/icomb/IComb.java 
+ . String MA_propositionURL = "": nova
+ . static int width = -1: novo, para 'getParameter("width")'
+ . public static int getAppletWidth (): novo
+ . Panel centralPanel: no lugar do nome insignificante 'aux'  
+ . public IComb (): acresc. 'instanceIcomb = applet;'
+ . static void main (String[] args):
+ . void iniciaParam ():
+  + para applet definir lingua, acresc. 'String [] strLang { "lang=" + getParameter("lang") }; if (strLang!=null)...'
+  + troquei 'MA_PARAM_proposition' para 'MA_PARAM_Proposition'
+  + acresc. 'MA_propositionURL=getParameter("MA_PARAM_Proposition"); if (MA_propositionURL!=null && MA_propositionURL.equalsIgnoreCase("true"))'
+
+- src/base/MontaFace.java
+ . 'NOME_IMG_LOGO' -> 'IMG_LOGO'; 'IMG_LOGO_SMALL' novo
+ . void criaPainelSuperior (): verifica 'icomb.IComb.width' para decidir se usa 'IMG_LOGO' ou 'IMG_LOGO_SMALL' ('')
+
+- src/icomb/ui/StagePanel.java
+ . troquei todos 'I18n.getInstance().getString("...")' por  'I18n.getString("...")'
+ . 
+
+- src/icomb/events/ObjectManager.java
+ . static CustomChoice criaCombo (Component pai, Vector keys, Vector values, String tooltip): troquei 'choice=new CustomChoice(keys,values)' por 'if (values!=null) choice=new CustomChoice(keys,values); else choice=new CustomChoice(keys);'
+
+- src/icomb/util/Util.java
+ . static void listVectorComp (Vector vec): novo, auxiliar p/ listar conteudo de Vector
+ . static String getString (String key): passei para estático p/ simplificar de 'I18n.getInstance().getString("...")' p/ apenas  'I18n.getString("...")'
+
+- src/icomb/util/I18n.java
+ . static void setConfig (String [] args): evita erro em applet, acresc. 'if (!icomb.IComb.ehApplet())' para 'Locale loc = new Locale(lingua,pais); Locale.setDefault(loc);'
+
+- src/icomb/ui/DrawingPanel.java
+ . void paint (Graphics g): 'try/catch' p/ pegar falta de imagem
+
+- src/icomb/util/GerenciadorRecursos.java
+ . static Image getImagem (MontaFace mf, String nomeCompletoImagem): dupliquei parte do cód. acresc. 'if/else' p/ eliminar decisão via 'try/catch'
+
+- src/icomb/util/Constants.java
+ No Java 1.4 Blackdown, altura de 'choices' esta grande, qdo tem 2 filas a prim. é truncada
+ . Dimension DIMENSION_BUTTON = new Dimension(132,15): era '132,23'
+
+- src/icomb/ui/StagePanel.java
+ . static void setFontStatic (Component cmp): acresc. msg p/ informar erro em 'catch'
+ . Panel secondLine (): simplificacoes, 'new Dimension(100, ALT)->100, ALT, new Dimension(80, ALT)'->'80, ALT, new Dimension(150, ALT)'->'150, ALT, new Dimension(23, ALT2)'->'23, ALT2, new Dimension(150, ALT)->150, ALT'
+ . Panel thirdLine (): 'new Dimension(100, ALT)->100, ALT, new Dimension(80, ALT)->80, ALT, new Dimension(150, ALT)->150, ALT, new Dimension(23, ALT2)->23, ALT2, new Dimension(150, ALT)->150, ALT'; 
+ . void itemStateChanged (ItemEvent evt): troquei 'lblExplain.setVisible(true)' por 'lblExplain.setVisible(false)' (deduzi erro pelo comentario 'nao mostra termo "e" ate que defina')
+
+- src/i18n_pt_BR.properties
+ . chooseOption=Escolha uma opção: nova, p/ 'Util.java'
+
+Acertos de msg faltante em 'i18n_en_US.properties'
+ . choiceNumberOfPrepositions-dica, choiceAttribute1-dica, choiceRelation1-dica, choiceElements1-dica, inNotInSet, inNotInSet-dica, choiceAttribute2-dica, choiceRelation2-dica, choiceElements2-dica, verifyStage-dica, choiceNumbers-dica, choiceFormula-dica, choiceN-dica, choiceP-dica,
+ . ok-dica, cancel-dica, addStage-dica 
+Acertos de msg faltante em 'i18n_fr_FR.properties'
+ . todos os acima e mais 43 do tipo 'help' (com prefixo 'help)
+
+
+Rever traducoes-chave: "é"->"oui";  "não é"->"non", "está em"->"est à" ou "não está em"->"n'est pas" ????
+ + http://fr.wikipedia.org/wiki/Combinaison_avec_répétition
+   C(n,p): n-combinaisons de p éléments / n éléments pris k à k 
+ + http://fr.wikipedia.org/wiki/Puissance_d'un_nombre
+   « a puissance n » ou « a exposant n »
+
+
+Indentacao:
+- src/icomb/objects/Estagio.java
+
+
+[2010/02/23] leo
+
+Falta:
+ 1. permitir redimensionar janela via aplicativo e sob applet permitir janela maior
+    escolhendo se cabeçalho será menor ou maior
+ 2. no caso de cabeçalho peque colocar "Versão: N" em outra posição
+
+- src/icomb/ui/TrataImagem.java: identação, teste para achar erro de imagem 'Uncaught error fetching image:' (cabecalho-icomb_peq.gif)
+ . static Image pegaImagem (String str_imagem): eliminei 'ImageIcon icon = new ImageIcon(image);'
+
+- src/base/MontaFace.java
+ . void criaPainelSuperior (): acresc. 'int width_aux' e 'if (width_aux>0)' sob 'Constants.PANEL_WIDTH = imagem_logo.getWidth(null);' evita erro qdo imagem vazia
+
+- src/icomb/util/Constants.java: identação
+- src/icomb/ui/StagePanel.java: identação
+- src/icomb/ui/NewStageButtonPanel.java: identação
+- src/icomb/ui/ConstructionPanel.java: identação
+
+
+[2010/02/23] Alexandre: redução de dimensões
+
+- src/base/MontaFace.java
+- src/icomb/util/Configuracoes.java
+- src/icomb/ui/StagePanel.java
+- src/icomb/ui/ListPanel.java
+- src/icomb/ui/ValidationPanel.java
+- src/icomb/ui/NewStageButtonPanel.java
+- src/icomb/ui/ConstructionPanel.java
+
+
+[2010/02/15] Alexandre -> temp2
+
+- src/icomb/ui/NewStageButtonPanel.java:
+ . NewStageButtonPanel (ConstructionPanel pai): acresc. 'btnResetConstruction = ObjectManager.criaBotao(...)'
+ . void actionPerformed (ActionEvent e): acresc. 'if (e.getSource() == btnResetConstruction) {...}'
+
+- src/icomb/ui/DefinedExercisePanel.java: ?
+ . void actionPerformed (ActionEvent e): eliminei 'pai.redraw()' pois agora o painel já está presente
+   internacionalizar 'strAjuda'
+   "Acione o botão \"Novo Estágio\" para iniciar construção. Para ver detalhes do Universo acione o botão " +
+   "\"Mostrar Universo\" ao lado. O botão \"Ajuda\" abrirá o sistema de Help do iComb."'
+
+- src/icomb/ui/SetMachinePanel.java: estende 'src/icomb/ui/VerticalPanel.java'
+ .  void update (): acresc. 'if (dep == null) dep=new DefinedExercisePanel(this); addComponent(dep);... addComponent(dp);'
+
+LOB -> temp
+ Tentei eliminar os "flicker" retirando "remove" e "add" de componentes. O "flicker" grande inicial,
+ que eliminava e recolocava todo o painel principal consegui eliminar. Mas tem teste a fazer.
+
+- src/base/MontaFace.java: acabei, voltando estrutura anterior, mantendo novo 'completaMontaFace(...)'
+ . MontaFace (Applet applet, boolean ehApplet): eliminei construção do painel, passando para 'montaFace(...)'; passei p/ início 2 'ObjectManager.setMachine....'
+ . void completaMontaFace (Applet applet, boolean ehApplet): com cód. eliminado de construtor acima
+
+- /src/icomb/objects/Universo.java: identação
+
+- src/icomb/ui/DefinedExercisePanel.java: ?
+ . falta internacionalizar: 'strAjuda = "Acione o botão \"Novo Estágio\" para iniciar construção. Para ver detalhes do Universo acione o botão " +
+         "\"Mostrar Universo\" ao lado. O botão \"Ajuda\" abrirá o sistema de Help do iComb.";'
+ . 'SetMachinePanel painelSetMachine' no lugar de 'SetMachinePanel pai'
+ . void actionPerformed(ActionEvent e): novo 'painelSetMachine.habilitarNovoEstagio();' - 'icomb.ui.SetMachinePanel.habilitarNovoEstagio()
+
+- src/icomb/ui/ConstructionPanel.java: estende 'src/icomb/ui/VerticalPanel.java'
+ . 'SetMachinePanel painelSetMachine': nome mais "alto-nível" no lugar de 'SetMachinePanel pai'
+ . void habilitarNovoEstagio (): novo, para 'src/icomb/ui/SetMachinePanel.java', faz 'NewStageButtonPanel painel_nsbp.open();'
+   e 'carregaAtributos(ObjectManager.setMachine.getUniverso())'
+
+- src/icomb/ui/StagePanel.java: identação
+ . 'ConstructionPanel painelConstrucao' no lugar de 'ConstructionPanel pai'
+ . void carregaAtributos (icomb.objects.Universo universo): novo, para carregar atributos em 'chAttributes1' via 'chAttributes1.populate(universo.getAtributos())'
+ . Hashtable getMap (): msg de segurança, para teste
+ 
+- src/icomb/ui/NewStageButtonPanel.java:
+ . internacionalizar: 'ObjectManager.setMachine.mudaDic("Selecione as opções para a montagem do primeiro estágio...");'
+   'MessageFrame.showMessage("Exercício enviado com sucesso!", pai);'
+ . String btnNewStage (): novo, para teste
+
+- src/icomb/machine/SetMachine.java: identação
+
+- src/icomb/machine/SetMachine.java: identação + reduzi alguns "remove/add" para evitar "flicker", precisa testar mais
+ . void habilitarNovoEstagio (): novo, chama 'src/icomb/ui/ConstructionPanel habilitarNovoEstagio()'
+ . void update ():
+   + 'removeAllComponents();' eliminei
+   + nos 'if' com '(dep == null)', '(dup == null)', '(cp == null)' e '(dp == null)' subordinei aos 'ifs': addComponent(dep), addComponent(dup), addComponent(cp) e 'addComponent(dp)'
+     isso melhor a inicialização do iComb, evitando uma piscada inicial
+   + no 'cp = new ConstructionPanel(this); addComponent(cp);' adotei estrutura dos demais, colocando 'if (cp!=null)'
+   + nos 'if' 7, 8  e 9: deixei com os 'new' e 'addComponent(...)' -> passar p/ mesma estrutura?
+
+
+[2010/02/12]
+
+Faltam:
+- src/icomb/ui/NewStageButtonPanel.java: internacionalizar 'eraseThisStage-dica'
+
+- src/icomb/ui/ValidationPanel.java: internacionalizar 'changeConstruction-dica'
+  + aproveitar o botão de 'mudar solução' e colocá-lo tb ao final
+  + na área de texto após o "eu terminei", deixar anotado o resultado do exercício 
+    (a menos de PARAM que impeça resposta ao aluno)
+  + mudar o texto do botão "enviar" para "avaliar solução"
+
+- falta colocar todas as msg nova p/ Inglês e Francês
+
+---
+
+- src/icomb/events/ObjectManager.java: identações, comentário
+
+- src/icomb/ui/NewStageButtonPanel.java: identações
+
+- src/icomb/ui/PopUpFrame.java: identações
+
+- src/icomb/ui/VerticalPanel.java: comentários, identações, acentos UTF -> iso8859-1
+
+- src/icomb/ui/ConstructionPanel.java: identação
+ . em 'NewStageButtonPanel painel_nsbp;', 'StagePanel painel_sp;' e 'ListPanel painel_lp;' acresc. 'painel_'
+
+---
+Ao clicar em validar, o painel é trocado e 3 botões que def. propr. de estágio são cortados parte inferior
+arrumei mudando o 'layout' de 'Panel panelValStage' em 'StagePanel.java'
+
+- src/icomb/ui/ChooseUniversePanel.java
+ . ChooseUniversePanel (SetMachinePanel pai): coloquei 'I18n....' para 'choiceNumbers-dica'
+ . void actionPerformed (ActionEvent e): tem msg 'hard coded': 'strAjuda = "Acione o botão ...'
+ . void verifyStage (): é mesmo necessário 'panelFormula.removeAll();' e 'panelFormula.add(panelFormulaEdit);'?
+
+- src/icomb/ui/NewStageButtonPanel.java: identaçao, falta msg 'hard codede' ('udaDic("Selecione as opções para a montagem do primeiro estágio..."')
+
+- src/icomb/ui/StagePanel.java: identação
+ . StagePanel (ConstructionPanel pai): 
+  + troquei '...Panel()' por 'Panel panelValStage = new Panel(new BorderLayout());' - efeito colateral, alt. botão ficou grande!
+  + acresc. 'lblFormula.setFont(Configuracoes.FONTE_BOTAO);' p/ ficar compatível com 'src/icomb/events/ObjectManager.java!defineCoresFonte(...)'
+  + alterei 'layout' de 'panelValStage' ('setLayout(null)') e acresc. 'panelValStage.setSize(Configuracoes.LARG_CENTRAL,30); btnVerifyStage.setSize(90,23);...'
+  + troquei '...' por 'inNotInSet' e '...-dica' por 'inNotInSet-dica'
+  + 'I18n.getInstance().getString("texto")' subst. os textos: "choiceFormula-dica", "choiceN-dica", "choiceP-dica"
+ . Panel constroiPainel (int ind, CustomChoice cc1, CustomChoice cc2, CustomChoice cc3, Button btn)
+   + '...100);' -> 'painelCombos.setSize(Configuracoes.LARG_CENTRAL, 60);'
+ . Panel firstLine (): 'choiceNumberOfPrepositions-dica' -> 'chNumberOfProp=...I18n.getInstance().getString("choiceNumberOfPrepositions-dica"));'
+ . Panel secondLine ():
+  + dúvida, 'btnEscolheN' está em uso?, é um botão sem msg que fica sempre escondido, tem como ação abrir uma janela
+  + colocado 'I18n.getInstance().getString("texto")' subst. os textos: "choiceAttribute1-dica"; "choiceRelation1-dica"; "choiceElements1-dica"
+
+- src/i18n_*.properties:
+ # src/icomb/ui/ListPanel.java
+ . choiceAction-dica = Após definir todos os estágios escolha como eles serão agrupados para formar o conjunto final
+ # src/icomb/ui/ChooseUniversePanel.java
+ . ok-dica = Após definido o número de elementos neste estágio clique neste botão
+ . cancel-dica = Se desejar cancelar esta fórmula clique aqui
+ . addStage-dica = Se o número de elementos do estágio estiver correto, clique aqui
+ # src/icomb/ui/StagePanel.java
+ . ? choiceNumbers-dica=Escolha o número de propriedades que definirão o conjunto formado por este estágio
+ . choiceNumbers-dica = Escolha o número de elementos do conjunto deste estágio
+ . choiceFormula-dica = Escolha o tipo de fórmula que gerará o número de elementos deste estágio
+ . choiceN-dica = Escolha o número de elementos neste estágio
+ . choiceP-dica = Escolha o número termos para combinações neste estágio
+ . choiceNumberOfPrepositions-dica: Escolha o número de propriedades para definir o conjunto do estágio
+ . choiceAttribute1-dica: Escolha se conjunto do estágio será definido por valor ou por naipe
+ . choiceRelation1-dica: Escolha o tipo de relação que definirá o conjunto do estágio
+ . choiceElements1-dica: Escolha o tipo de elementos para definir o conjunto do estágio
+ . inNotInSet = Selecione valores
+ . inNotInSet-dica = Selecione os valores para propriedade do tipo pertinência (ou não) a conjunto
+ . choiceAttribute2-dica: idem choiceAttribute1-dica
+ . choiceRelation2-dica: idem choiceRelation1-dica
+ . choiceElements2-dica: idem choiceElements1-dica
+ . verifyStage-dica: Verificar a validade deste estágio
+
+
+[2010/02/11]
+
+Alteração do tamanho geral do painel (com "Construcao"; "Estagio" e "Lista de estagios")
+
+- src/icomb/events/ObjectManager.java: eliminei msg ao colocar dicas via PopUp
+
+- src/icomb/util/Configuracoes.java:
+ . ALT_CENTRAL = 368; era '378;' - usado em 'src/icomb/ui/StagePanel.java: Dimension getPreferredSize()'
+
+- src/icomb/ui/ListPanel.java:
+ . Dimension getPreferredSize (): 'return new Dimension(Constants.PANEL_WIDTH-10, 115);' era '125', para deixar espaço p/ 'DrawingPanel'
+ . Panel listPanel = new Panel (new BorderLayout()): deixei X eliminei 'public Insets getInsets() { return new Insets(0,0,0,5); }'
+
+- src/icomb/ui/ConstructionPanel.java: estende 'VerticalPanel'
+ . public Dimension getPreferredSize(): eliminado! usar o próprio 'StagePanel' com 'Configuracoes.ALT_CENTRAL_ESTAGIO'
+
+- src/icomb/ui/VerticalPanel.java: identações, comentários
+ . acresc. 'import icomb.util.Constants; // Constants.PANEL_WIDTH'
+ . '(Configuracoes.LARG_CENTRAL,Configuracoes.ALT_CENTRAL)' -> 'dimension=new Dimension(Constants.PANEL_WIDTH,Configuracoes.ALT_CENTRAL)'
+
+- src/icomb/ui/StagePanel.java:
+ .  Dimension getPreferredSize (): era '(Constants.PANEL_WIDTH-10...)' -> 'new Dimension(Constants.PANEL_WIDTH, Configuracoes.ALT_CENTRAL_ESTAGIO)'
+
+- src/icomb/ui/DrawingPanel.java:
+ . acresc. 'import icomb.util.I18n;'
+ . void paint (Graphics g): "Clique na imagem para gerar outra configuração" -> 'I18n.getInstance().getString("drawingClickImage1")'
+ . Dimension getPreferredSize(): 'return new Dimension(Constants.PANEL_WIDTH, 125);' era '125'
+
+- src/i18n_pt_BR.properties:
+ . typeCtrlClickForMultipleSelection=Digite Ctrl-Clique para múltipla seleção: estava "Ctrl-Click"
+
+- src/i18n_*.properties:
+ . drawingClickImage1=Clique na imagem para gerar outra configuração: novo
+ . drawingClickImage1=Click the image to generate another configuration
+ . drawingClickImage1=Cliquez sur l\'image pour en générer une autre configuration
+
+
+[2010/01/25]
+
+?Alexandre?
+
+LOB
+- src/icomb/util/Configuracoes.java: núm. de versão -> 0.8
+ + Configuracoes.FONTE_VERSAO: ampliei para '10', estava '7' e ilegível
+- src/icomb/IComb.java: comentário sobre versão 0.8
+- src/icomb/util/GerenciadorRecursos.java: versão desatualizada, indentação e 'try/catch' - recuperado da versão do dia 2009_11_19
+
+
+[2009/10/19]
+
+ From San Antonio, TX
+
+- src/icomb/IComb.java:
+ . String MA_lang = "": novo
+ . String Ma_lang (): novo, para 'icomb/util/I18n.java'
+ . void iniciaParam (): MA_lang = getParameter("lang"); // para lingua
+
+
+[2009/10/12]
+
+Versao 0.7:
+
+- i18n*:
+ iComb=Combinatória Interativa na Internet
+ iComb=Combinatoire interactif sur la Internet
+ 
+- icomb/util/I18n.java: para ler lingua via aplicativo, com 'lang=pt'
+ . private static ResourceBundle bundle: passei para static
+ . private static String lingua, pais: novos
+ . static boolean decompoeConfig (String str): novo
+ . static void setConfig (String [] args): novo
+ . static void defineBundle (boolean chamaDefine): novo
+
+
+- icomb/IComb.java: para permitir carregar aplicativo com lingua definida por parâmetro
+ . static void main (String[] args) throws IOException: acresc. 'I18n.setConfig(args); I18n.defineBundle(true);'
+ . void Monta (): eliminei 'I18n.changeInstance("pt","BR");'
+	 
+---
+
+- icomb/util/I18n.java: para evitar náo abrir iComb na falta de arquivo de msgs
+ . I18n (String language, String country): acresc. 'try/catch'
+ . String getString (String key): acresc. 'if (bundle==null) return key;'
+
+- icomb/util/GerenciadorRecursos.java: tentativa de abrir iComb mesmo faltando imagens - ainda não
+ .static Image getImagem (MontaFace mf,String nomeCompletoImagem): acresc. 'try/catch (Exception e1)'
+ . static InputStream getInputStream (MontaFace mf,String nomeCompletoArquivo): acresc. 'try/catch(Exception e)'
+
+- icomb/ui/ComponentImage.java: tentativa de abrir iComb mesmo faltando imagens - ainda não
+ . ComponentImage (Image image, String nomeImg): troquei 'throws NullPointerException' por 'try/catch'
+
+- icomb/ui/TrataImagem.java: tentativa de abrir iComb mesmo faltando imagens - ainda não
+ . static Image pegaImagem (String str_imagem): 
+
+- base/MontaFace.java: aqui finalmente resolvido o congelamento ao faltar imagem 'cabecalho-icomb.gif'
+ . void criaPainelSuperior ():
+  + acresc. 'try/catch' sob 'imagem_logo=icomb.ui.TrataImagem.pegaImagem(NOME_IMG_LOGO);'
+  + acresc. 'try/catch' sob 'Constants.PANEL_WIDTH = imagem_logo.getWidth(null);'
+  + em 'northPanel = new Panel ()', acresc. no inicio 'if (imagem_logo==null) return;'
+
+- icomb/IComb.java: apenas por segurança, motiva pelas alterações de imagem acima
+ . static void main (String[] args): acresc. 'try/catch'
+
+
+[2009/10/10]
+
+- i18n_*.properties: definidos 'changeExercise-dica, help-dica, startExercise-dica'
+- i18n_pt_BR.properties: alterei 'newStage-dica'
+- i18n_fr_FR.properties, i18n_en_US.properties: define 'newStage-dica, iWant-dica'
+ startExercise-dica=Inicia a resolução do exercício
+ help-dica=Clique aqui para obter abrir a janela de ajuda do iComb
+ changeExercise-dica=Clique aqui para iniciar a geração de um novo exercício
+ about_and=choose configurations to define the elements of properties
+ era "choose configurations to define the properties' elements" (para eliminar o apostrofe)
+ Alterei tambem:
+  newStage-dica=Acionando o botão um novo estágio será criado.\nUm ou mais estágios poderão ser criados para compor\na solução final.
+ passei para
+  A solução final do exercício será feita a partir da junção de estágios.\nCada estágio deve conter parte do conjunto resposta, definindo-se\nnÃºmeros de elementos e propriedades que deve satisfazer.
+
+- icomb/ui/ToolTip.java:
+ + várias pequenas alteração (coloquei 'static' para ficar mais fácil alterar algumas configurações)
+ + alterei largura e altura, de modo a ficar mais justo a mensagem (dispensei a "margem" de 60 para garantir largura)
+
+
+23/02/2009: versao 0.4
+
+- icomb/objects/Universo: try/catch para recuperar erro e dar msg
+ .  static Condicao [] interpretaCondicao (String strCond): 'try/catch' para 'pattern=Pattern.compile("([^;]*)"); matcher=pattern.matcher(strCond);'
+
+
+22/02/2009: versao 0.3
+
+- i18n_*.properties:
+ about_and=escolha configurações que definem elementos de propriedade
+ about_and=choose configurations to define the properties' elements
+ about_and=choose configurations to define the properties' elements
+
+- icomb/ui/StagePanel: acerto em "layout" do texto
+ + novo campo: 'private static final Label LBL_AND LBL_AND_ABOUT
+ + passou a usar 'ObjectManager.criaBotao(...)' com 2 param.
+ + várias subst. do tipo 'ObjectManager.criaCombo(*)' -> 'ObjectManager.criaCombo(panel, *)'
+ . Panel secondLine (): adicionado 'lblSpace.setVisible(false);'
+ . Panel thirdLine (): adicionado 'lblAnd.setVisible(false);'
+ . void invisible (): adicionado 'lblSpace.setVisible(false);'
+ . void verifyStage (): dim. de botao "Validar estagio" esta tendo dim. alterada! apelei e coloquei 'btnVerifyStage.setSize(132,23);'
+    
+- icomb/ui/ListPanel: acerto em "layout" do texto
+ + várias subst. do tipo 'ObjectManager.criaCombo(*)' -> 'ObjectManager.criaCombo(panel, *)'
+ 
+- icomb/ui/ListPanel: acerto em "layout" do texto 
+ + 2 substit. do tipo 'ObjectManager.criaBotao(I18n...))' -> 'ObjectManager.criaBotao(buttonPanel,I18n...))'
+
+- icomb/ui/ConstructionFooterPane: acerto em "layout" do texto
+ + 'ObjectManager.criaBotao(I18n.getInstance().getString("iAmDone"))' -> 'ObjectManager.criaBotao(this,I18n.getInstance().getString("iAmDone"))'
+
+: acerto em "layout" do texto
+
+
+20,21/02/2009
+
+ i18n_*_*.properties:
+  + versao=Versão | Version | Version
+
+---
+
+- icomb/IComb: layout
+ . public static final String versao = "0.1";: novo
+ . private boolean ehApplet = false;: novo
+ . static void main (String[] args):
+  + eliminei chamada a 'applet.init()'
+  + chama 'Monta()'
+ . void init ():
+  + eliminei todo cód., agora em 'Monta()'
+  + chama 'iniciaParam()'
+ . void iniciaParam (): novo, com cód. do antigo 'init()'
+ . void Monta (): novo, parte final do cód. do antigo 'init()'
+
+- base/MontaFace:
+ . void criaPainelSuperior (): 
+  + 'northPanel = new Panel(new GridLayout(3, 1))' -> 'northPanel = new Panel(new GridLayout(3, 1))'
+  + adic. 'Imagem imagem = new Imagem(this, NOME_IMG_LOGO);  northPanel.add(imagem);'
+ . void linhaDois (): adic. 'northPanel.add(logo);'
+
+- icomb/ui/Imagem:
+ . adic. 'import base.MontaFace; import icomb.util.GerenciadorRecursos;'
+ 
+- icomb/ui/FinalPanel: layout
+
+- icomb/ui/DefinedExercisePanel: layout
+
+- comb/ui/UniversoFrame: novo acerto para imagem, eliminei "icomb/ui/Imagem" agora usa "icomb/ui/TrataImagem"
+
+- comb/ui/ImagePanel: novo acerto para imagem
+ . void setElement (Universo universo, Element element, String nome, Image img): acresc. 2 últ. param.
+
+- icomb/ui/DefinedExercisePanel:
+ . void paint (Graphics g): como fundo agora é azul escuro, troquei cor de 'g.setColor(Color.blue);' para 'g.setColor(Color.white);'
+
+- base/Configuracoes.java: novo 'public static final Color corBarraSupInf = new Color(32, 64, 128);'
+
+- base/EsquemaVisual: agora 'Color corBarraSupInf = Configuracoes.corBarraSupInf; // new Color(32, 64, 128);'
+
+- icomb/ui/ObjectManager:
+ . static CustomChoice criaCombo (Component pai, Vector keys): novo, subst. 'criaCombo(Component pai,Vector keys)'
+ . static CustomChoice criaCombo (Component pai, Vector keys, Vector values): novo, subst. 'criaCombo(Vector keys,Vector values)'
+
+- icomb/ui/DefinedExercisePanel: alterado 'layout' e incluido 2 '*.setBackground(Configuracoes.corBarraSupInf);'
+
+- icomb/ui/ChooseUniversePanel: acerto em "layout" do texto
+ . ChooseUniversePanel (SetMachinePanel pai):
+   + 'btnHelp = new Button("Ajuda");' -> 'btnHelp = ObjectManager.criaBotao(panelButtons,I18n.getInstance().getString("help"));'
+
+- icomb/ui/SetMachinePanel: acerto em "layout" do texto
+ + intoduzido 'static final String CODIFICACAO = Configuracoes.CODIFICACAO;': 'CODIFICACAO' no lugar de "UTF-8" (ou "ISO-8859-1")
+
+- icomb/util/ParserParametros: acerto em "layout" do texto
+
+- icomb/ui/VerticalPanel: acerto em "layout" do texto
+ . VerticalPanel (MontaFace mf): 'dimension=new Dimension(595,545);' -> '...Dimension(Configuracoes.LARG_CENTRAL,Configuracoes.ALT);'
+	  
+ eliminei 'Dimension dimension' e métodos 'setDimension' e 'getPreferredSize'
+ . void setDimension (Dimension dimension): eliminei comando ('this.dimension = dimension;')
+
+- icomb/machine/SetMachine: acerto em "layout" do texto
+ + tem muitas msg "hard code"!
+ 
+- icomb/ui/NewStageButtonPanel: acerto em "layout" do texto
+ + comecei a preparar para passar a usar 'ObjectManager.criaBotao(...)' com 2 param.
+
+
+19/02/2009
+
+Obs: por problemas de não aparecerem as imagens de cartas a partir do botão
+"Mostrar Universo", fiz muitas mexidas, inclusive inseri um nova classe
+"icomb/ui/Imagem" tivo Canvas. A mantive, por favor, veja se vale a pena
+preservá-la.
+
+- icomb/ui/MessageFrame: precisa alterar 'super("Mensagem");' falta usar ' I18n.getInstance().getString("...")'
+
+- LocalizacaoImagens: nova classe
+
+- icomb/ui/UniversoFrame.java:
+ . layout geral
+ . import java.awt.Label;: acresc.
+ . import icomb.util.I18n;: acresc.
+ . void load():
+   + simplifiquei dentro do "for", eliminando a criacao de um painel desnecessario
+   + fiz várias alterações para tentar aparecer as imagens na janela, no
+     final funcionou após inserir um Frame para teste e retirando-o continuou OK...
+
+- icomb/ui/ImagePanel:
+ . private String nome;: novo campo
+ . Image getElement(Universo universo, Element element): novo
+
+- icomb/ui/Imagem: nova classe, providencia um Canvas com Image dentro
+
+
+16/02/2009
+
+Verao com problema: ao selecionar erro de elementos/propr. lista a msg de erro abaixo, mas não dá uma "pop-up".
+15s: VerificaEstagio$2 elementos tais que valor ? As ERRO--->A condi??o selecionada est? provavelmente correta, por?m o n?mero de elementos est? errado. ]
+
+
+08/02/2009
+
+cp -p icomb/IComb.java ../src/icomb/.
+cp -p icomb/ui/FinalPanel.java ../src/icomb/.
+cp -p icomb/ui/SetMachinePanel.java ../src/icomb/.
+
+javac  -encoding iso-8859-1 icomb/IComb.java
+javac  -encoding iso-8859-1 icomb/ui/FinalPanel.java
+javac  -encoding iso-8859-1 icomb/ui/SetMachinePanel.java
+
+---
+* para permitir escolher entrar ou não o botão de "enviar/avaliar"
+
+icomb/IComb.java: apelei para 'static' para não precisar interferir muito
+                  no iComb, mas pode ser uma solução muito ruim se quebrar 
+                  o padrão de programação do mesmo! Por favor, reveja isso.
+ . public static String MA_PARAM_online: novo campo para consulta em 'icomb/ui/FinalPanel.FinalPanel(SetMachinePanel)'
+ . void init (): acresc. 'MA_PARAM_online = getParameter("MA_PARAM_online"); // se 1, então é exercício 'on-line' => não mostra ao usuário o resu...'
+
+icomb/ui/FinalPanel.java: para permitir disponibilizar ou não botão de envio no iComb
+ . import icomb.IComb;: acresc. 
+ . FinalPanel(SetMachinePanel pai): 'btnSend.setEnabled(false);' por 'if (IComb.MA_PARAM_online!=null && IComb.MA_PARAM_online.equals("1")) btnSend.setEnabled(false); else btnSend.setEnabled(true);'
+
+---
+* para impedir erro ao "enviar/avaliar" via HTML sem estar conectado
+
+icomb/ui/SetMachinePanel.java
+ . enviar(): acresc. 'try/catch' para evitar URL
+ icomb.ui.SetMachinePanel.enviar(SetMachinePanel.java:188)
+ 
+ Rever "UTF-8" fixo
+ String data = URLEncoder.encode("envWebArquivo", "UTF-8") + "=" + URLEncoder.encode(strAcoes, "UTF-8")

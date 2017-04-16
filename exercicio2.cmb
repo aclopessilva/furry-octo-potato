@@ -1,0 +1,10 @@
+# iComb: http://www.matematica.br
+[ .: version: 0.1 :. ]
+
+{EnumGabarito: Com um baralho de 32 cartas, quantas mãos de 5 cartas é possível formar com exatamente 2 cartas de Copas e exatamente duas cartas de Espadas?}
+{Tipo: exercicio: 1}	
+{solucao: _h793676b7850d77742327274d7737323873127631a3d333734767647656a776665677766b5c53674577623393bd3754bd3b1a03173914}
+{resposta: 12544}
+{ArquivoUniverso: baralho/baralho.xml}
+{dica: Um baralho de 32 cartas corresponde a um baralho comum sem as cartas cujos valores são menores do que Sete. Portanto, um baralho de 32 cartas possui 8 cartas de cada naipe (7,8,9,10,Valete, Dama, Rei e Ás)}
+{online: 0}
